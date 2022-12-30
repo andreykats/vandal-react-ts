@@ -1,27 +1,27 @@
 # Vandal {working title} Frontend
-## Requirements
 
+## Requirements
 Node 19.3
 
 https://nodejs.org/en/download/current/
 
-## Installation
-
+## Download
+Open terminal and run:
 ```
 git clone git@github.com:andreykats/vandal-react.git
 ```
 
+## Installation
 In the project directory, run:
-### `npm install`
+```
+npm install
+```
 
 ## Running
-
 In the project directory, run:
-### `npm run start-local`
-
-## ---
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+```
+npm run start-local
+```
 
 ## Available Scripts
 
@@ -89,3 +89,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
