@@ -7,39 +7,12 @@ import { ArtService, Item } from '../client';
 
 
 function GridView(): JSX.Element {
-    const [getItems, setItems] = useState<Item[]>([])
-    const [getSelected, setSelected] = useState<Item | undefined>()
+    const [items, setItems] = useState<Item[]>([])
+    const [selected, setSelected] = useState<Item | undefined>()
 
     useEffect(() => {
-        fetch()
+        fetchFeed()
     }, [])
-
-    /** 
-    // 3 ways to create and array of "CellView" elements from an array of "Item" types
-
-    // First method
-    var itemsList: JSX.Element[] = []
-    for (var item of getItems) {
-        itemsList.push(
-            <CellView key={item.id} item={item} didSelect={() => setSelected(item)} />
-        )
-    }
-
-    // Second method
-    var itemsList: JSX.Element[] = []
-    getItems.forEach((item) => {
-        itemsList.push(
-            <CellView key={item.id} item={item} didSelect={() => setSelected(item)} />
-        )
-    })
-
-    */
-
-    // Third method
-    let itemsList = getItems.map((item) => {
-        return <CellView key={item.id} item={item} didSelect={() => setSelected(item)} />
-    })
-
 
     /**
     // 3 ways to fetch API data
@@ -71,9 +44,9 @@ function GridView(): JSX.Element {
      */
 
     // Third method (using the OpenAPI Client) try/catch method
-    async function fetch() {
+    async function fetchFeed() {
         try {
-            const response = await ArtService.artGetNewFeedItems()
+            const response = await ArtService.artGetFeedItems()
             console.log(response)
             setItems(response)
         } catch (error: any) {
@@ -82,43 +55,34 @@ function GridView(): JSX.Element {
         }
     }
 
-    function showView() {
-        if (getSelected) {
-            return (
-                <div>
-                    <div className="heading">
-                        Decided to distroy "{getSelected.name}", eh?
-                    </div>
-                    <div className="heading">
-                        You monster
-                    </div>
-                    <div>
-                        <RowView item={getSelected} onClose={() => (setSelected(undefined))} />
-                    </div>
+    if (selected) {
+        return (
+            <div>
+                <div className="heading">
+                    Decided to distroy "{selected.name}", eh?
                 </div>
-            )
-        } else {
-            return (
-                <div>
-                    <div className="heading">
-                        Choose the beauty you wish to destroy
-                    </div>
-                    <div className="flex-container">
-                        {itemsList}
-                    </div>
+                <div className="heading">
+                    You monster
                 </div>
-            )
-        }
-    }
-
-    return (
-        <div>
-            <div className="title">
-                Welcome you stinkin' Vandal
+                <div>
+                    <RowView item={selected} didClose={() => (setSelected(undefined), fetchFeed())} />
+                </div>
             </div>
-            {showView()}
-        </div>
-    )
+        )
+    } else {
+        return (
+            <div>
+                <div className="heading">
+                    Choose the beauty you wish to destroy
+                </div>
+                <div className="flex-container">
+                    {items.map(item => {
+                        return <CellView key={item.id} item={item} didSelect={() => setSelected(item)} />
+                    })}
+                </div>
+            </div>
+        )
+    }
 }
 
 export default GridView;

@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Upload = {
-    name: string;
+export type FormVandalizedItem = {
+    item_id: number;
     user_id: number;
-    image: Blob;
+    image_data: string;
 };
 

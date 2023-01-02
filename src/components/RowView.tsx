@@ -13,25 +13,21 @@ export enum Views {
 interface RowProps {
     item: Item
     children?: JSX.Element | JSX.Element[]
-    onClose: () => void
+    didClose: () => void
 }
 
 function RowView(props: RowProps): JSX.Element {
-    const [getView, setView] = useState(Views.RowView)
-    const [getItems, setItems] = useState<Item[]>([])
-    const [getSelected, setSelected] = useState<Item>()
+    const [view, setView] = useState(Views.RowView)
+    const [items, setItems] = useState<Item[]>([])
+    const [selected, setSelected] = useState<Item>()
 
     useEffect(() => {
-        fetchFeed(props.item.base_layer_id!)
-    }, [props.item.id]);
+        fetchHistory(props.item.id)
+    }, [props.item.id])
 
-    let itemsList = getItems.map((item) => {
-        return <CellView key={item.id} item={item} didSelect={() => (setSelected(item), setView(Views.ImageView))} />
-    })
-
-    async function fetchFeed(id: number) {
+    async function fetchHistory(item_id: number) {
         try {
-            const response = await ArtService.artGetItemHistory(id)
+            const response = await ArtService.artGetItemHistory(item_id)
             console.log(response)
             setItems(response)
         } catch (error: any) {
@@ -40,32 +36,26 @@ function RowView(props: RowProps): JSX.Element {
         }
     }
 
-    function showView(viewType: Views) {
-        switch (viewType) {
-            case Views.CanvasView:
-                return <CanvasView item={props.item} didClose={() => (setView(Views.RowView), fetchFeed(props.item.base_layer_id!))} />
-            case Views.ImageView:
-                return <ImageView item={getSelected!} didClose={() => (setView(Views.RowView))} />
-            case Views.RowView:
-                return (
-                    <div className="flex-row">
-                        <div className="flex-stack">
-                            <button id="button-new" onClick={() => (setView(Views.CanvasView))}> NEW </button>
-                            <button id="button-new" onClick={() => (props.onClose())}> CLOSE </button>
-                        </div>
-                        <div className="flex-row">
-                            {itemsList}
-                        </div>
+    switch (view) {
+        case Views.CanvasView:
+            return <CanvasView item={items[0]} didClose={() => (setView(Views.RowView), fetchHistory(props.item.id))} />
+        case Views.ImageView:
+            return <ImageView item={selected!} didClose={() => setView(Views.RowView)} />
+        case Views.RowView:
+            return (
+                <div className="flex-row">
+                    <div className="flex-stack">
+                        <button id="button-new" onClick={() => setView(Views.CanvasView)}> NEW </button>
+                        <button id="button-new" onClick={props.didClose}> CLOSE </button>
                     </div>
-                )
-        }
+                    <div className="flex-row">
+                        {items.map(item => {
+                            return <CellView key={item.id} item={item} didSelect={() => (setSelected(item), setView(Views.ImageView))} />
+                        })}
+                    </div>
+                </div>
+            )
     }
-
-    return (
-        <div>
-            {showView(getView)}
-        </div >
-    )
 }
 
 export default RowView;

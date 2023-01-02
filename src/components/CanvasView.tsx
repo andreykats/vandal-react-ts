@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+// import React, { useState } from 'react';
+// import axios from 'axios';
 import { fabric } from 'fabric';
 import { API_IMAGES, API_SUBMIT } from '../constants';
-import { ArtService, Item, Submit } from '../client';
+import { ArtService, Item, FormVandalizedItem, } from '../client';
 
 interface CanvasProps {
     item: Item
@@ -28,7 +28,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
         const element = document.getElementById('base-layer')
         const rect = element!.getBoundingClientRect();
 
-        // If element is not Nil then use its dimensions for canvas
+        // If element is not nil then use its dimensions for canvas
         if (rect) {
             canvas.setWidth(rect.width);
             canvas.setHeight(rect.height);
@@ -84,14 +84,14 @@ function CanvasView(props: CanvasProps): JSX.Element {
         var base64String = img.replace("data:", "").replace(/^.+,/, "")
 
         // Create a form and populate fields
-        var formData = {} as Submit;
-        formData.item_id = props.item!.id
+        var formData = {} as FormVandalizedItem
+        formData.item_id = props.item.id
         formData.user_id = 99
         formData.image_data = base64String
 
         // Submit using the auto-generated api client then try to catch any errors
         try {
-            const response = await ArtService.artCreateModifiedItem(formData)
+            const response = await ArtService.artCreateVandalizedItem(formData)
             console.log(response)
             back()
         } catch (error: any) {
@@ -104,7 +104,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
         <div>
             <div className="flex-container">
                 <div className="image-stack">
-                    <img className="under" id="base-layer" src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" onLoad={() => didLoad()} />
+                    <img className="under" id="base-layer" src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" onLoad={didLoad} />
                     <img className="over" src={API_IMAGES + props.item.id + ".jpg"} alt="" />
                 </div>
                 <div>
@@ -118,7 +118,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
                 <button id="button-blue" onClick={selectBlue}>Blue</button>
                 <button id="button-cancel" onClick={back}>Cancel</button>
             </div>
-        </div >
+        </div>
     )
 }
 

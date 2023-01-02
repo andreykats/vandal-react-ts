@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Submit = {
-    item_id: number;
+export type FormBaseItem = {
+    name: string;
     user_id: number;
-    image_data: string;
+    image: Blob;
 };
 
