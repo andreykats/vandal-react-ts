@@ -8,7 +8,7 @@ https://nodejs.org/en/download/current/
 ## Download
 Open terminal and run:
 ```
-git clone git@github.com:andreykats/vandal-react.git
+git clone git@github.com:andreykats/vandal-react-ts.git
 ```
 
 ## Installation
@@ -21,6 +21,11 @@ npm install
 In the project directory, run:
 ```
 npm run start-local
+```
+
+Then go to:
+```
+http://localhost:3000
 ```
 
 ## Available Scripts

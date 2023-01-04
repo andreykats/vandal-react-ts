@@ -17,7 +17,7 @@ export class UsersService {
      * @returns User Successful Response
      * @throws ApiError
      */
-    public static getAllUsersUsersGet(
+    public static usersGetAllUsers(
         skip?: number,
         limit: number = 100,
     ): CancelablePromise<Array<User>> {
@@ -40,7 +40,7 @@ export class UsersService {
      * @returns User Successful Response
      * @throws ApiError
      */
-    public static createUserUsersPost(
+    public static usersCreateUser(
         requestBody: UserCreate,
     ): CancelablePromise<User> {
         return __request(OpenAPI, {
@@ -60,7 +60,7 @@ export class UsersService {
      * @returns User Successful Response
      * @throws ApiError
      */
-    public static getUserUsersUserIdGet(
+    public static usersGetUser(
         userId: number,
     ): CancelablePromise<User> {
         return __request(OpenAPI, {

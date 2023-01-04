@@ -5,17 +5,17 @@ import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
-export class AdminService {
+export class LiveService {
 
     /**
-     * Redirect
+     * Get
      * @returns any Successful Response
      * @throws ApiError
      */
-    public static adminRedirect(): CancelablePromise<any> {
+    public static liveGet(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/admin/',
+            url: '/live/',
         });
     }
 

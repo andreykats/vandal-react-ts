@@ -8,7 +8,6 @@ interface ImageProps {
 }
 
 function ImageView(props: ImageProps): JSX.Element {
-
     // If the id and base_layer_id match then don't overlay and just show one of them
     if (props.item.id === props.item.base_layer_id) {
         return (

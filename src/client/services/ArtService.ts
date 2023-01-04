@@ -78,6 +78,27 @@ export class ArtService {
     }
 
     /**
+     * Delete User Content
+     * @param itemId
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static artDeleteUserContent(
+        itemId: number,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/art/{item_id}',
+            path: {
+                'item_id': itemId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+
+    /**
      * Create Base Item
      * @param formData
      * @returns Item Successful Response
@@ -147,6 +168,18 @@ export class ArtService {
             errors: {
                 422: `Validation Error`,
             },
+        });
+    }
+
+    /**
+     * Delete All User Created Content
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static artDeleteAllUserCreatedContent(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/art/destroy/',
         });
     }
 
