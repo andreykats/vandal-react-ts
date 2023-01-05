@@ -1,7 +1,5 @@
-// import React, { useState } from 'react';
-// import axios from 'axios';
 import { fabric } from 'fabric';
-import { API_IMAGES, API_SUBMIT } from '../constants';
+import { API_IMAGES } from '../constants';
 import { ArtService, Item, FormVandalizedItem, } from '../client';
 
 interface CanvasProps {
@@ -11,10 +9,27 @@ interface CanvasProps {
 }
 
 function CanvasView(props: CanvasProps): JSX.Element {
-    var canvas: fabric.Canvas;
+    var ws: WebSocket
+    var canvas: fabric.Canvas
 
     function didLoad() {
+        ws = initWebSocketClient()
         canvas = initCanvas()
+    }
+
+    function initWebSocketClient() {
+        var client_id = Date.now()
+        ws = new WebSocket(`ws://localhost:8000/live/ws/${client_id}`)
+
+        ws.onopen = function (event) {
+            console.log("Socket opened")
+        }
+
+        ws.onclose = function (event) {
+            console.error("Chat socket closed unexpectedly")
+        }
+
+        return ws
     }
 
     function initCanvas() {
@@ -34,12 +49,42 @@ function CanvasView(props: CanvasProps): JSX.Element {
             canvas.setHeight(rect.height);
         }
 
+        canvas.on("path:created", function (e: any) {
+            var pathCoordinates = e.path.path
+                .map(function (item: any) {
+                    return item.join(" ");
+                })
+                .join(" ")
+
+            var drawInstruction = {
+                pathCoordinates: pathCoordinates,
+                stroke: e.path.stroke,
+                strokeWidth: e.path.strokeWidth,
+                fill: false
+            }
+
+            var data = JSON.stringify({
+                message: {
+                    action: "draw",
+                    canvasSize: { height: canvas.height, width: canvas.width },
+                    drawInstruction: drawInstruction
+                }
+            })
+            console.log("Sending: ", data)
+            ws.send(data)
+        })
+
         return canvas;
     }
 
     function back() {
         console.log("back")
         props.didClose()
+    }
+
+    function resize() {
+        canvas.setHeight(200)
+        canvas.setWidth(200)
     }
 
     function selectRed() {
@@ -117,6 +162,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
                 <button id="button-green" onClick={selectGreen}>Green</button>
                 <button id="button-blue" onClick={selectBlue}>Blue</button>
                 <button id="button-cancel" onClick={back}>Cancel</button>
+                <button id="button-cancel" onClick={resize}>Resize</button>
             </div>
         </div>
     )
