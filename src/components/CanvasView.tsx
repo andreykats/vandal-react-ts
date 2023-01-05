@@ -54,6 +54,12 @@ function CanvasView(props: CanvasProps): JSX.Element {
         canvas.freeDrawingBrush.color = "#0000FF";
     }
 
+    function selectBlack() {
+        canvas.freeDrawingBrush.color = "#000000"
+    }
+
+
+
     /**
     function submitImage() {
         // Create a binary string from canvas
@@ -117,6 +123,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
                 <button id="button-green" onClick={selectGreen}>Green</button>
                 <button id="button-blue" onClick={selectBlue}>Blue</button>
                 <button id="button-cancel" onClick={back}>Cancel</button>
+                <button id="button-black" onClick={selectBlack}>Black</button>
             </div>
         </div>
     )
