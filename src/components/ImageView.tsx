@@ -69,10 +69,11 @@ function ImageView(props: ImageProps): JSX.Element {
 
         return ws
     }
+
     // If the id and base_layer_id match then don't overlay and just show one of them
     if (props.item.id === props.item.base_layer_id) {
         return (
-            <div className="flex-container" onClick={props.didClose}>
+            <div className="flex-container">
                 <div className="image-stack">
                     <img className="under" id="base-layer" src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" onLoad={didLoad} />
                 </div>
@@ -83,7 +84,7 @@ function ImageView(props: ImageProps): JSX.Element {
         )
     } else {
         return (
-            <div className="flex-container" onClick={props.didClose}>
+            <div className="flex-container">
                 <div className="image-stack">
                     <img className="under" id="base-layer" src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" onLoad={didLoad} />
                     <img className="over" src={API_IMAGES + props.item.id + ".jpg"} alt="" />

@@ -18,5 +18,4 @@ export type { ValidationError } from './models/ValidationError';
 export { AdminService } from './services/AdminService';
 export { ArtService } from './services/ArtService';
 export { DefaultService } from './services/DefaultService';
-export { LiveService } from './services/LiveService';
 export { UsersService } from './services/UsersService';
