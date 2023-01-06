@@ -9,27 +9,26 @@ interface CanvasProps {
 }
 
 function CanvasView(props: CanvasProps): JSX.Element {
-    var ws: WebSocket
+    var socket: WebSocket
     var canvas: fabric.Canvas
 
     function didLoad() {
-        ws = initWebSocketClient()
+        socket = initWebSocketClient()
         canvas = initCanvas()
     }
 
     function initWebSocketClient() {
-        var client_id = Date.now()
-        ws = new WebSocket(`ws://localhost:8000/live/ws/${client_id}`)
+        var socket = new WebSocket(`ws://localhost:8000/live/${props.item.id}`)
 
-        ws.onopen = function (event) {
+        socket.onopen = function (event) {
             console.log("Socket opened")
         }
 
-        ws.onclose = function (event) {
-            console.error("Chat socket closed unexpectedly")
+        socket.onclose = function (event) {
+            console.error("Socket closed unexpectedly")
         }
 
-        return ws
+        return socket
     }
 
     function initCanvas() {
@@ -50,14 +49,8 @@ function CanvasView(props: CanvasProps): JSX.Element {
         }
 
         canvas.on("path:created", function (e: any) {
-            var pathCoordinates = e.path.path
-                .map(function (item: any) {
-                    return item.join(" ");
-                })
-                .join(" ")
-
             var drawInstruction = {
-                pathCoordinates: pathCoordinates,
+                pathCoordinates: e.path.path,
                 stroke: e.path.stroke,
                 strokeWidth: e.path.strokeWidth,
                 fill: false
@@ -66,12 +59,12 @@ function CanvasView(props: CanvasProps): JSX.Element {
             var data = JSON.stringify({
                 message: {
                     action: "draw",
-                    canvasSize: { height: canvas.height, width: canvas.width },
+                    canvasSize: { width: canvas.width, height: canvas.height },
                     drawInstruction: drawInstruction
                 }
             })
-            console.log("Sending: ", data)
-            ws.send(data)
+
+            socket.send(data)
         })
 
         return canvas;
@@ -147,22 +140,17 @@ function CanvasView(props: CanvasProps): JSX.Element {
 
     return (
         <div>
-            <div className="flex-container">
-                <div className="image-stack">
-                    <img className="under" id="base-layer" src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" onLoad={didLoad} />
-                    <img className="over" src={API_IMAGES + props.item.id + ".jpg"} alt="" />
-                </div>
-                <div>
-                    <canvas id="canvas-sheet" />
-                </div>
+            <div className="canvas-container">
+                <img className="canvas-image" id="base-layer" src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" onLoad={didLoad} />
+                <img className="canvas-image" src={API_IMAGES + props.item.id + ".jpg"} alt="" />
+                <canvas id="canvas-sheet" />
             </div>
-            <div className="flex-toolbar">
+            <div className="canvas-toolbar">
                 <button id="button-save" onClick={submitImage}>Save</button>
                 <button id="button-red" onClick={selectRed}>Red</button>
                 <button id="button-green" onClick={selectGreen}>Green</button>
                 <button id="button-blue" onClick={selectBlue}>Blue</button>
                 <button id="button-cancel" onClick={back}>Cancel</button>
-                <button id="button-cancel" onClick={resize}>Resize</button>
             </div>
         </div>
     )

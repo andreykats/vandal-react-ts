@@ -28,11 +28,11 @@ function RowView(props: RowProps): JSX.Element {
     async function fetchHistory(item_id: number) {
         try {
             const response = await ArtService.artGetItemHistory(item_id)
-            console.log(response)
+            console.log("fetchHistory: ", response)
             setItems(response)
         } catch (error: any) {
             console.error(error)
-            alert("Fetch Error: " + error.message)
+            alert("fetchHistory Error: " + error.message)
         }
     }
 
@@ -43,12 +43,12 @@ function RowView(props: RowProps): JSX.Element {
             return <ImageView item={selected!} didClose={() => setView(Views.RowView)} />
         case Views.RowView:
             return (
-                <div className="flex-row">
-                    <div className="flex-stack">
+                <div className="row-container">
+                    <div className="row-button-stack">
                         <button id="button-new" onClick={() => setView(Views.CanvasView)}> NEW </button>
                         <button id="button-new" onClick={props.didClose}> CLOSE </button>
                     </div>
-                    <div className="flex-row">
+                    <div className="row-container">
                         {items.map(item => {
                             return <CellView key={item.id} item={item} didSelect={() => (setSelected(item), setView(Views.ImageView))} />
                         })}

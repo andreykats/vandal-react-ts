@@ -1,3 +1,4 @@
+import React, { useState, useEffect, Component } from 'react';
 import { Item } from '../client';
 import { API_IMAGES, API_URL } from '../constants';
 import { fabric } from 'fabric';
@@ -9,18 +10,17 @@ interface CellProps {
 }
 
 function CellView(props: CellProps): JSX.Element {
-    var ws: WebSocket
+    var socket: WebSocket
     var canvas: fabric.Canvas
 
-    function didLoad() {
-        ws = initWebSocketClient()
+    useEffect(() => {
+        socket = initWebSocketClient()
         canvas = initCanvas()
-    }
+    }, [])
 
     function initWebSocketClient() {
-        var client_id = Date.now()
-        ws = new WebSocket(`ws://localhost:8000/live/ws/${client_id}`)
-        ws.onmessage = function (event) {
+        var socket = new WebSocket(`ws://localhost:8000/live/${props.item.id}`)
+        socket.onmessage = function (event) {
             var data = JSON.parse(event.data)
             console.log("Recieving: ", data)
 
@@ -29,53 +29,73 @@ function CellView(props: CellProps): JSX.Element {
                 return
             }
 
-            data = data.message.drawInstruction
-            var path = new fabric.Path(data.pathCoordinates, {
-                stroke: data.stroke,
-                strokeWidth: data.strokeWidth,
-                fill: data.fill
+            var reductionFactor = data.message.canvasSize.width / canvas.getWidth()
+            var drawInstruction = data.message.drawInstruction
+
+            // Modify the coordinate path to fit the new canvas dimensions of a cell
+            var pathCoordinates = drawInstruction.pathCoordinates
+                .map(function (item: any) {
+                    var newItem = item.map(function (coordinate: any) {
+                        // Skip first item in array
+                        if (item.indexOf(coordinate) > 0) {
+                            return coordinate / reductionFactor
+                        } else {
+                            // Return first item in array unchanged
+                            return coordinate
+                        }
+                    })
+                    // Join the array into a string as per FabricJS path format
+                    return newItem.join(" ");
+                })
+                .join(" ")
+
+            var path = new fabric.Path(pathCoordinates, {
+                stroke: drawInstruction.stroke,
+                strokeWidth: drawInstruction.strokeWidth / reductionFactor,
+                fill: drawInstruction.fill
             })
             canvas.add(path)
         }
 
-        ws.onclose = function (event) {
+        socket.onclose = function (event) {
             console.error("Chat socket closed unexpectedly")
         }
 
-        return ws
+        return socket
     }
 
     function initCanvas() {
-        canvas = new fabric.Canvas('canvas-sheet');
-        // canvas.isDrawingMode = true;
-        canvas.freeDrawingBrush.width = 10;
+        canvas = new fabric.Canvas("canvas-id:" + props.item.id)
+        canvas.freeDrawingBrush.width = 10
 
-        // Set canvas size based on the size of the base_layer image
-        const element = document.getElementById('base-layer')
-        const rect = element!.getBoundingClientRect();
+        const element = document.getElementById("base-layer-id:" + props.item.id)
+        const rect = element?.getBoundingClientRect()
 
         // If element is not nil then use its dimensions for canvas
         if (rect) {
-            canvas.setWidth(rect.width);
-            canvas.setHeight(rect.height);
+            canvas.setWidth(rect.width)
+            canvas.setHeight(rect.height)
         }
 
+        canvas.renderAll()
         return canvas;
     }
+
 
     // If the id and base_layer_id match then don't overlay and just show one of them
     if (props.item.id === props.item.base_layer_id) {
         return (
-            <div className="cell-single" onClick={() => props.didSelect(props.item)}>
-                <img id="img" src={API_URL + "images/" + props.item.base_layer_id + ".jpg"} alt="" />
+            <div className="cell-container" onClick={() => props.didSelect(props.item)}>
+                <img className="cell-image" id={"base-layer-id:" + props.item.id} src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" />
+                <canvas id={"canvas-id:" + props.item.id} />
             </div>
         )
     } else {
         return (
-            // Overlay base layer image and user generated image
-            <div className="cell-stack" onClick={() => props.didSelect(props.item)} >
-                <img className="under" id="img" src={API_URL + "images/" + props.item.base_layer_id + ".jpg"} alt="" />
-                <img className="over" id="img" src={API_URL + "images/" + props.item.id + ".jpg"} alt="" />
+            <div className="cell-container" onClick={() => props.didSelect(props.item)}>
+                <img className="cell-image" id={"base-layer-id:" + props.item.id} src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" />
+                <img className="cell-image" src={API_IMAGES + props.item.id + ".jpg"} alt="" />
+                <canvas id={"canvas-id:" + props.item.id} />
             </div>
         )
     }

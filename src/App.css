@@ -20,51 +20,48 @@
   margin: 20px;
 }
 
-
-.flex-container {
+.grid-container {
   display: flex;
-  margin: 20px;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   /* border: 2px solid rgb(0, 255, 0); */
 }
 
-.flex-row {
+.row-container {
   display: flex;
 }
 
-.flex-stack {
+.row-button-stack {
   display: flex;
   flex-direction: column;
   align-items: stretch;
 }
 
-.image-stack {
+.cell-container {
+  position: relative;
+  margin: 10px;
+}
+
+.cell-image {
   position: absolute;
+  width: 500px;
 }
 
-.under {
-  position: absolute;
-  z-index: -1;
-}
-
-.over {
-  z-index: 0;
-}
-
-.flex-toolbar {
+.canvas-container {
   display: flex;
   justify-content: center;
-  /* border: 2px solid rgb(255, 0, 0); */
+  position: relative;
 }
 
-.inner {
+.canvas-image {
+  position: absolute;
+}
+
+.canvas-toolbar {
   display: flex;
-}
-
-#img {
-  width: 500px;
-  margin: 20px;
+  justify-content: center;
+  margin: 10px;
 }
 
 #button-save {
@@ -89,4 +86,31 @@
   width: 400px;
   height: 200px;
   margin: 20px;
+}
+
+#button-red {
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  background-color: rgb(255, 0, 0);
+  padding: 10px;
+}
+
+#button-green {
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
+  background-color: rgb(0, 255, 0);
+  padding: 10px;
+}
+
+#button-blue {
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  background-color: rgb(0, 0, 255);
+  padding: 10px;
 }

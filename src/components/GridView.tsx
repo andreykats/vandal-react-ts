@@ -47,11 +47,11 @@ function GridView(): JSX.Element {
     async function fetchFeed() {
         try {
             const response = await ArtService.artGetFeedItems()
-            console.log(response)
+            console.log("fetchFeed: ", response)
             setItems(response)
         } catch (error: any) {
             console.error(error)
-            alert("Fetch Error: " + error.message)
+            alert("fetchFeed Error: " + error.message)
         }
     }
 
@@ -75,7 +75,7 @@ function GridView(): JSX.Element {
                 <div className="heading">
                     Choose the beauty you wish to destroy
                 </div>
-                <div className="flex-container">
+                <div className="grid-container">
                     {items.map(item => {
                         return <CellView key={item.id} item={item} didSelect={() => setSelected(item)} />
                     })}
