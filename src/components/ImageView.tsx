@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from 'react';
 import { Item } from '../client';
-import { API_URL } from '../constants';
-import { fabric } from 'fabric';
 import { API_IMAGES } from '../constants';
 
 interface ImageProps {

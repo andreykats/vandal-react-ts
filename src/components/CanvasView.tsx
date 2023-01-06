@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import { API_IMAGES } from '../constants';
+import { API_IMAGES, API_WS } from '../constants';
 import { ArtService, Item, FormVandalizedItem, } from '../client';
 
 interface CanvasProps {
@@ -18,7 +18,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
     }
 
     function initWebSocketClient() {
-        var socket = new WebSocket(`ws://localhost:8000/live/${props.item.id}`)
+        var socket = new WebSocket(API_WS + props.item.id)
 
         socket.onopen = function (event) {
             console.log("Socket opened")

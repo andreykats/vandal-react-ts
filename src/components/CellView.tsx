@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Component } from 'react';
 import { Item } from '../client';
-import { API_IMAGES, API_URL } from '../constants';
+import { API_IMAGES, API_WS } from '../constants';
 import { fabric } from 'fabric';
 
 interface CellProps {
@@ -19,7 +19,7 @@ function CellView(props: CellProps): JSX.Element {
     }, [])
 
     function initWebSocketClient() {
-        var socket = new WebSocket(`ws://localhost:8000/live/${props.item.id}`)
+        var socket = new WebSocket(API_WS + props.item.id)
         socket.onmessage = function (event) {
             var data = JSON.parse(event.data)
             console.log("Recieving: ", data)
