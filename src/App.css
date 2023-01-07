@@ -1,0 +1,116 @@
+.App {
+  text-align: center;
+}
+
+.title {
+  font-size: 40px;
+  text-decoration: none;
+  text-align: center;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  margin: 20px;
+}
+
+.heading {
+  font-size: 20px;
+  text-decoration: none;
+  text-align: center;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  margin: 20px;
+}
+
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  /* border: 2px solid rgb(0, 255, 0); */
+}
+
+.row-container {
+  display: flex;
+}
+
+.row-button-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.cell-container {
+  position: relative;
+  margin: 10px;
+}
+
+.cell-image {
+  position: absolute;
+  width: 500px;
+}
+
+.canvas-container {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.canvas-image {
+  position: absolute;
+}
+
+.canvas-toolbar {
+  display: flex;
+  justify-content: center;
+  margin: 10px;
+}
+
+#button-save {
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  background-color: #333;
+  padding: 10px;
+}
+
+#button-cancel {
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  background-color: rgb(127, 127, 127);
+  padding: 10px;
+}
+
+#button-new {
+  width: 400px;
+  height: 200px;
+  margin: 20px;
+}
+
+#button-red {
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  background-color: rgb(255, 0, 0);
+  padding: 10px;
+}
+
+#button-green {
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
+  background-color: rgb(0, 255, 0);
+  padding: 10px;
+}
+
+#button-blue {
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  background-color: rgb(0, 0, 255);
+  padding: 10px;
+}
