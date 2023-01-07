@@ -1,7 +1,5 @@
-// import React, { useState } from 'react';
-// import axios from 'axios';
 import { fabric } from 'fabric';
-import { API_IMAGES, API_SUBMIT } from '../constants';
+import { API_IMAGES, API_WS } from '../constants';
 import { ArtService, Item, FormVandalizedItem, } from '../client';
 
 interface CanvasProps {
@@ -11,10 +9,26 @@ interface CanvasProps {
 }
 
 function CanvasView(props: CanvasProps): JSX.Element {
-    var canvas: fabric.Canvas;
+    var socket: WebSocket
+    var canvas: fabric.Canvas
 
     function didLoad() {
+        socket = initWebSocketClient()
         canvas = initCanvas()
+    }
+
+    function initWebSocketClient() {
+        var socket = new WebSocket(API_WS + props.item.id)
+
+        socket.onopen = function (event) {
+            console.log("Socket opened")
+        }
+
+        socket.onclose = function (event) {
+            console.error("Socket closed unexpectedly")
+        }
+
+        return socket
     }
 
     function initCanvas() {
@@ -34,12 +48,36 @@ function CanvasView(props: CanvasProps): JSX.Element {
             canvas.setHeight(rect.height);
         }
 
+        canvas.on("path:created", function (e: any) {
+            var drawInstruction = {
+                pathCoordinates: e.path.path,
+                stroke: e.path.stroke,
+                strokeWidth: e.path.strokeWidth,
+                fill: false
+            }
+
+            var data = JSON.stringify({
+                message: {
+                    action: "draw",
+                    canvasSize: { width: canvas.width, height: canvas.height },
+                    drawInstruction: drawInstruction
+                }
+            })
+
+            socket.send(data)
+        })
+
         return canvas;
     }
 
     function back() {
         console.log("back")
         props.didClose()
+    }
+
+    function resize() {
+        canvas.setHeight(200)
+        canvas.setWidth(200)
     }
 
     function selectRed() {
@@ -102,16 +140,12 @@ function CanvasView(props: CanvasProps): JSX.Element {
 
     return (
         <div>
-            <div className="flex-container">
-                <div className="image-stack">
-                    <img className="under" id="base-layer" src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" onLoad={didLoad} />
-                    <img className="over" src={API_IMAGES + props.item.id + ".jpg"} alt="" />
-                </div>
-                <div>
-                    <canvas id="canvas-sheet" />
-                </div>
+            <div className="canvas-container">
+                <img className="canvas-image" id="base-layer" src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" onLoad={didLoad} />
+                <img className="canvas-image" src={API_IMAGES + props.item.id + ".jpg"} alt="" />
+                <canvas id="canvas-sheet" />
             </div>
-            <div className="flex-toolbar">
+            <div className="canvas-toolbar">
                 <button id="button-save" onClick={submitImage}>Save</button>
                 <button id="button-red" onClick={selectRed}>Red</button>
                 <button id="button-green" onClick={selectGreen}>Green</button>
