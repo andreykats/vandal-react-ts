@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CellView from './CellView';
 import ImageView from './ImageView';
 import CanvasView from './CanvasView';
@@ -19,7 +19,7 @@ interface RowProps {
 function RowView(props: RowProps): JSX.Element {
     const [view, setView] = useState(Views.RowView)
     const [artworks, setArtwork] = useState<Artwork[]>([])
-    const [selected, setSelected] = useState<Artwork>()
+    const [selected, setSelected] = useState<Artwork>(props.art)
 
     useEffect(() => {
         fetchHistory(props.art.id)

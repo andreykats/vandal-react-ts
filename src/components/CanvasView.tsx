@@ -6,23 +6,17 @@ import { ArtService, Artwork, FormVandalizedItem, } from '../client';
 interface CanvasProps {
     art: Artwork
     children?: JSX.Element | JSX.Element[]
-    didClose: () => void
+    didClose: (art: Artwork) => void
 }
 
 function CanvasView(props: CanvasProps): JSX.Element {
     var socket: WebSocket
     var canvas: fabric.Canvas
 
-
-    // useEffect(() => {
-    //     socket = initWebSocketClient()
-    //     canvas = initCanvas()
-    // }, [])
-
-    function didLoad() {
+    useEffect(() => {
         socket = initWebSocketClient()
         canvas = initCanvas()
-    }
+    }, [])
 
     function initWebSocketClient() {
         var socket = new WebSocket(API_WS + props.art.id)
@@ -39,20 +33,20 @@ function CanvasView(props: CanvasProps): JSX.Element {
     }
 
     function initCanvas() {
-        canvas = new fabric.Canvas('canvas-sheet');
-        canvas.isDrawingMode = true;
-        canvas.freeDrawingBrush.width = 10;
+        canvas = new fabric.Canvas('canvas-sheet')
+        canvas.isDrawingMode = true
+        canvas.freeDrawingBrush.width = 10
 
-        selectRed();
+        selectRed()
 
         // Set canvas size based on the size of the base_layer image
         const element = document.getElementById("layer-" + props.art.id)
-        const rect = element!.getBoundingClientRect();
+        const rect = element!.getBoundingClientRect()
 
         // If element is not nil then use its dimensions for canvas
         if (rect) {
-            canvas.setWidth(rect.width);
-            canvas.setHeight(rect.height);
+            canvas.setWidth(rect.width)
+            canvas.setHeight(rect.height)
         }
 
         canvas.on("path:created", function (e: any) {
@@ -77,14 +71,8 @@ function CanvasView(props: CanvasProps): JSX.Element {
         return canvas;
     }
 
-    function back() {
-        console.log("back")
-        props.didClose()
-    }
-
-    function resize() {
-        canvas.setHeight(200)
-        canvas.setWidth(200)
+    function back(art: Artwork) {
+        props.didClose(art)
     }
 
     function selectRed() {
@@ -98,30 +86,6 @@ function CanvasView(props: CanvasProps): JSX.Element {
     function selectBlue() {
         canvas.freeDrawingBrush.color = "#0000FF";
     }
-
-    /**
-    function submitImage() {
-        // Create a binary string from canvas
-        var img = canvas.toDataURL();
-        var base64String = img.replace("data:", "").replace(/^.+,/, "");
-
-        // Create a form and populate fields
-        var formData = new FormData();
-        formData.append("item_id", props.item!.id.toString());
-        formData.append("user_id", "99");
-        formData.append("image_data", base64String);
-
-        // Perform request
-        axios.post(API_SUBMIT, formData, {})
-            .then(result => {
-                console.log(result)
-                back()
-            }).catch((err) => {
-                console.log(err);
-                alert("Upload img error: " + err.message);
-            });
-    }
-    */
 
     async function submitImage() {
         // Create a binary string from canvas
@@ -137,8 +101,9 @@ function CanvasView(props: CanvasProps): JSX.Element {
         // Submit using the auto-generated api client then try to catch any errors
         try {
             const response = await ArtService.artCreateVandalizedItem(formData)
-            console.log(response)
-            back()
+            console.log("Submit img resquest: ", formData)
+            console.log("Sumbit img response: ", response)
+            back(response)
         } catch (error: any) {
             console.log(error)
             alert("Submit img error: " + error.message)
@@ -147,7 +112,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
 
     return (
         <div>
-            <div className="canvas-container" onLoad={didLoad} >
+            <div className="canvas-container" >
                 {props.art.layers.reverse().map(layer => {
                     return <img style={{ zIndex: layer.id }} className="canvas-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
                 })}
@@ -158,7 +123,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
                 <button id="button-red" onClick={selectRed}>Red</button>
                 <button id="button-green" onClick={selectGreen}>Green</button>
                 <button id="button-blue" onClick={selectBlue}>Blue</button>
-                <button id="button-cancel" onClick={back}>Cancel</button>
+                <button id="button-cancel" onClick={() => back(props.art)}>Cancel</button>
             </div>
         </div>
     )
