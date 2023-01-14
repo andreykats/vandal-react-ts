@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CellView from './CellView';
 import ImageView from './ImageView';
 import CanvasView from './CanvasView';
-import { ArtService, Item } from '../client';
+import { ArtService, Artwork } from '../client';
 
 export enum Views {
     RowView,
@@ -11,25 +11,25 @@ export enum Views {
 }
 
 interface RowProps {
-    item: Item
+    art: Artwork
     children?: JSX.Element | JSX.Element[]
     didClose: () => void
 }
 
 function RowView(props: RowProps): JSX.Element {
     const [view, setView] = useState(Views.RowView)
-    const [items, setItems] = useState<Item[]>([])
-    const [selected, setSelected] = useState<Item>()
+    const [artworks, setArtwork] = useState<Artwork[]>([])
+    const [selected, setSelected] = useState<Artwork>(props.art)
 
     useEffect(() => {
-        fetchHistory(props.item.id)
-    }, [props.item.id])
+        fetchHistory(props.art.id)
+    }, [props.art.id])
 
     async function fetchHistory(item_id: number) {
         try {
-            const response = await ArtService.artGetItemHistory(item_id)
+            const response = await ArtService.artGetArtworkHistory(item_id)
             console.log("fetchHistory: ", response)
-            setItems(response)
+            setArtwork(response)
         } catch (error: any) {
             console.error(error)
             alert("fetchHistory Error: " + error.message)
@@ -38,9 +38,9 @@ function RowView(props: RowProps): JSX.Element {
 
     switch (view) {
         case Views.CanvasView:
-            return <CanvasView item={items[0]} didClose={() => (setView(Views.RowView), fetchHistory(props.item.id))} />
+            return <CanvasView art={props.art} didClose={() => (setView(Views.RowView))} />
         case Views.ImageView:
-            return <ImageView item={selected!} didClose={() => setView(Views.RowView)} />
+            return <ImageView art={selected!} didClose={() => setView(Views.RowView)} />
         case Views.RowView:
             return (
                 <div className="row-container">
@@ -49,8 +49,8 @@ function RowView(props: RowProps): JSX.Element {
                         <button id="button-new" onClick={props.didClose}> CLOSE </button>
                     </div>
                     <div className="row-container">
-                        {items.map(item => {
-                            return <CellView key={item.id} item={item} didSelect={() => (setSelected(item), setView(Views.ImageView))} />
+                        {artworks.map(art => {
+                            return <CellView key={art.id} art={art} didSelect={() => (setSelected(art), setView(Views.ImageView))} />
                         })}
                     </div>
                 </div>

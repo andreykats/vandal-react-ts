@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CellView from './CellView';
 import RowView from './RowView';
-import { ArtService, Item } from '../client';
+import { ArtService, Artwork } from '../client';
 
 
 function GridView(): JSX.Element {
-    const [items, setItems] = useState<Item[]>([])
-    const [selected, setSelected] = useState<Item | undefined>()
+    const [artworks, setArtworks] = useState<Artwork[]>([])
+    const [selected, setSelected] = useState<Artwork | undefined>()
 
     useEffect(() => {
         fetchFeed()
@@ -46,7 +46,7 @@ function GridView(): JSX.Element {
         try {
             const response = await ArtService.artGetFeedItems()
             console.log("fetchFeed: ", response)
-            setItems(response)
+            setArtworks(response)
         } catch (error: any) {
             console.error(error)
             alert("fetchFeed Error: " + error.message)
@@ -57,13 +57,13 @@ function GridView(): JSX.Element {
         return (
             <div>
                 <div className="heading">
-                    Decided to distroy "{selected.name}", eh?
+                    Decided to distroy "{selected.layers[0].name}", eh?
                 </div>
                 <div className="heading">
                     You monster
                 </div>
                 <div>
-                    <RowView item={selected} didClose={() => (setSelected(undefined), fetchFeed())} />
+                    <RowView art={selected} didClose={() => (setSelected(undefined))} />
                 </div>
             </div>
         )
@@ -74,8 +74,8 @@ function GridView(): JSX.Element {
                     Choose the beauty you wish to destroy
                 </div>
                 <div className="grid-container">
-                    {items.map(item => {
-                        return <CellView key={item.id} item={item} didSelect={() => setSelected(item)} />
+                    {artworks.map(art => {
+                        return <CellView key={art.id} art={art} didSelect={() => setSelected(art)} />
                     })}
                 </div>
             </div>
