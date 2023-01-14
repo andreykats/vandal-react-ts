@@ -1,9 +1,10 @@
+import { useEffect } from 'react';
 import { fabric } from 'fabric';
 import { API_IMAGES, API_WS } from '../constants';
-import { ArtService, Item, FormVandalizedItem, } from '../client';
+import { ArtService, Artwork, FormVandalizedItem, } from '../client';
 
 interface CanvasProps {
-    item: Item
+    art: Artwork
     children?: JSX.Element | JSX.Element[]
     didClose: () => void
 }
@@ -12,13 +13,19 @@ function CanvasView(props: CanvasProps): JSX.Element {
     var socket: WebSocket
     var canvas: fabric.Canvas
 
+
+    // useEffect(() => {
+    //     socket = initWebSocketClient()
+    //     canvas = initCanvas()
+    // }, [])
+
     function didLoad() {
         socket = initWebSocketClient()
         canvas = initCanvas()
     }
 
     function initWebSocketClient() {
-        var socket = new WebSocket(API_WS + props.item.id)
+        var socket = new WebSocket(API_WS + props.art.id)
 
         socket.onopen = function (event) {
             console.log("Socket opened")
@@ -39,7 +46,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
         selectRed();
 
         // Set canvas size based on the size of the base_layer image
-        const element = document.getElementById('base-layer')
+        const element = document.getElementById("layer-" + props.art.id)
         const rect = element!.getBoundingClientRect();
 
         // If element is not nil then use its dimensions for canvas
@@ -123,7 +130,7 @@ function CanvasView(props: CanvasProps): JSX.Element {
 
         // Create a form and populate fields
         var formData = {} as FormVandalizedItem
-        formData.item_id = props.item.id
+        formData.item_id = props.art.id
         formData.user_id = 99
         formData.image_data = base64String
 
@@ -140,10 +147,11 @@ function CanvasView(props: CanvasProps): JSX.Element {
 
     return (
         <div>
-            <div className="canvas-container">
-                <img className="canvas-image" id="base-layer" src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" onLoad={didLoad} />
-                <img className="canvas-image" src={API_IMAGES + props.item.id + ".jpg"} alt="" />
-                <canvas id="canvas-sheet" />
+            <div className="canvas-container" onLoad={didLoad} >
+                {props.art.layers.reverse().map(layer => {
+                    return <img style={{ zIndex: layer.id }} className="canvas-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
+                })}
+                <canvas style={{ zIndex: props.art.id + 1 }} id="canvas-sheet" />
             </div>
             <div className="canvas-toolbar">
                 <button id="button-save" onClick={submitImage}>Save</button>

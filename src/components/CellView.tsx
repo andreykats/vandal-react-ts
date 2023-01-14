@@ -1,12 +1,12 @@
-import React, { useState, useEffect, Component } from 'react';
-import { Item } from '../client';
+import { useEffect } from 'react';
+import { Artwork } from '../client';
 import { API_IMAGES, API_WS } from '../constants';
 import { fabric } from 'fabric';
 
 interface CellProps {
-    item: Item
+    art: Artwork
     children?: JSX.Element | JSX.Element[]
-    didSelect: (item: Item) => void
+    didSelect: (art: Artwork) => void
 }
 
 function CellView(props: CellProps): JSX.Element {
@@ -14,12 +14,12 @@ function CellView(props: CellProps): JSX.Element {
     var canvas: fabric.Canvas
 
     useEffect(() => {
-        socket = initWebSocketClient()
+        // socket = initWebSocketClient()
         canvas = initCanvas()
     }, [])
 
     function initWebSocketClient() {
-        var socket = new WebSocket(API_WS + props.item.id)
+        var socket = new WebSocket(API_WS + props.art.id)
         socket.onmessage = function (event) {
             var data = JSON.parse(event.data)
             console.log("Recieving: ", data)
@@ -65,10 +65,10 @@ function CellView(props: CellProps): JSX.Element {
     }
 
     function initCanvas() {
-        canvas = new fabric.Canvas("canvas-id:" + props.item.id)
+        canvas = new fabric.Canvas("canvas-" + props.art.id)
         canvas.freeDrawingBrush.width = 10
 
-        const element = document.getElementById("base-layer-id:" + props.item.id)
+        const element = document.getElementById("layer-" + props.art.id)
         const rect = element?.getBoundingClientRect()
 
         // If element is not nil then use its dimensions for canvas
@@ -78,27 +78,18 @@ function CellView(props: CellProps): JSX.Element {
         }
 
         canvas.renderAll()
-        return canvas;
+        return canvas
     }
 
 
-    // If the id and base_layer_id match then don't overlay and just show one of them
-    if (props.item.id === props.item.base_layer_id) {
-        return (
-            <div className="cell-container" onClick={() => props.didSelect(props.item)}>
-                <img className="cell-image" id={"base-layer-id:" + props.item.id} src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" />
-                <canvas id={"canvas-id:" + props.item.id} />
-            </div>
-        )
-    } else {
-        return (
-            <div className="cell-container" onClick={() => props.didSelect(props.item)}>
-                <img className="cell-image" id={"base-layer-id:" + props.item.id} src={API_IMAGES + props.item.base_layer_id + ".jpg"} alt="" />
-                <img className="cell-image" src={API_IMAGES + props.item.id + ".jpg"} alt="" />
-                <canvas id={"canvas-id:" + props.item.id} />
-            </div>
-        )
-    }
+    return (
+        <div className="cell-container" onClick={() => props.didSelect(props.art)}>
+            {props.art.layers.reverse().map(layer => {
+                return <img style={{ zIndex: layer.id }} className="cell-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
+            })}
+            <canvas style={{ zIndex: props.art.id + 1 }} id={"canvas-" + props.art.id} />
+        </div>
+    )
 }
 
 export default CellView;
