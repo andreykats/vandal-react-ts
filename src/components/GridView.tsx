@@ -3,14 +3,27 @@ import CellView from './CellView';
 import RowView from './RowView';
 import { ArtService, Artwork } from '../client';
 
+import { useParams, useNavigate, Navigate } from 'react-router-dom'
 
 function GridView(): JSX.Element {
+    const navigate = useNavigate()
     const [artworks, setArtworks] = useState<Artwork[]>([])
-    const [selected, setSelected] = useState<Artwork | undefined>()
+    // const [selected, setSelected] = useState<Artwork | undefined>()
 
     useEffect(() => {
         fetchFeed()
     }, [])
+
+    function onSubmitHook(id: number) {
+        // navigate("/history/" + id)
+        // console.log("onSubmitHook: ", id)
+        navigate('/history/hello', { state: { id: id } })
+    }
+
+    function onSubmitJSX(id: number) {
+        console.log("onSubmitJSX: ", id)
+        return <Navigate to={"/history/" + id} />;
+    }
 
     /**
     // 3 ways to fetch API data
@@ -53,34 +66,47 @@ function GridView(): JSX.Element {
         }
     }
 
-    if (selected) {
-        return (
-            <div>
-                <div className="heading">
-                    Decided to distroy "{selected.layers[0].name}", eh?
-                </div>
-                <div className="heading">
-                    You monster
-                </div>
-                <div>
-                    <RowView art={selected} didClose={() => (setSelected(undefined))} />
-                </div>
+    // if (selected) {
+    //     return (
+    //         <div>
+    //             <div className="heading">
+    //                 Decided to distroy "{selected.layers[0].name}", eh?
+    //             </div>
+    //             <div className="heading">
+    //                 You monster
+    //             </div>
+    //             <div>
+    //                 <RowView art={selected} didClose={() => (setSelected(undefined))} />
+    //             </div>
+    //         </div>
+    //     )
+    // } else {
+    //     return (
+    //         <div>
+    //             <div className="heading">
+    //                 Choose the beauty you wish to destroy
+    //             </div>
+    //             <div className="grid-container">
+    //                 {artworks.map(art => {
+    //                     return <CellView key={art.id} art={art} didSelect={() => setSelected(art)} />
+    //                 })}
+    //             </div>
+    //         </div>
+    //     )
+    // }
+
+    return (
+        <div>
+            <div className="heading">
+                Choose the beauty you wish to destroy
             </div>
-        )
-    } else {
-        return (
-            <div>
-                <div className="heading">
-                    Choose the beauty you wish to destroy
-                </div>
-                <div className="grid-container">
-                    {artworks.map(art => {
-                        return <CellView key={art.id} art={art} didSelect={() => setSelected(art)} />
-                    })}
-                </div>
+            <div className="grid-container">
+                {artworks.map(art => {
+                    return <CellView key={art.id} art={art} didSelect={() => (onSubmitHook(art.id))} />
+                })}
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default GridView;
