@@ -1,28 +1,20 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'
 import CellView from './CellView';
-import RowView from './RowView';
 import { ArtService, Artwork } from '../client';
 
-import { useParams, useNavigate, Navigate } from 'react-router-dom'
 
 function GridView(): JSX.Element {
     const navigate = useNavigate()
     const [artworks, setArtworks] = useState<Artwork[]>([])
-    // const [selected, setSelected] = useState<Artwork | undefined>()
 
     useEffect(() => {
         fetchFeed()
     }, [])
 
-    function onSubmitHook(id: number) {
-        // navigate("/history/" + id)
-        // console.log("onSubmitHook: ", id)
-        navigate('/history/hello', { state: { id: id } })
-    }
-
-    function onSubmitJSX(id: number) {
-        console.log("onSubmitJSX: ", id)
-        return <Navigate to={"/history/" + id} />;
+    function onSelectArtwork(item_id: number) {
+        // Send params to the next page
+        navigate("/history/" + item_id)
     }
 
     /**
@@ -102,7 +94,7 @@ function GridView(): JSX.Element {
             </div>
             <div className="grid-container">
                 {artworks.map(art => {
-                    return <CellView key={art.id} art={art} didSelect={() => (onSubmitHook(art.id))} />
+                    return <CellView key={art.id} art={art} didSelect={() => (onSelectArtwork(art.id))} />
                 })}
             </div>
         </div>
