@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import CellView from './CellView';
-import ImageView from './ImageView';
-import CanvasView from './CanvasView';
+// import ImageView from './ImageView';
+// import CanvasView from './CanvasView';
 import { ArtService, Artwork } from '../client';
 
 // export enum Views {
@@ -23,9 +23,7 @@ type Params = {
 
 function HistoryView(): JSX.Element {
     const navigate = useNavigate()
-
     const { id } = useParams<Params>()
-
     const [artworks, setArtwork] = useState<Artwork[]>([])
 
     useEffect(() => {
@@ -47,7 +45,6 @@ function HistoryView(): JSX.Element {
         }
     }
 
-
     function selectViewArtwork(item_id: number) {
         // Send params to the next page
         navigate("/view/" + item_id)
@@ -57,7 +54,6 @@ function HistoryView(): JSX.Element {
         // Send state object to the next page
         navigate('/edit/', { state: { art: art } })
     }
-
 
     // switch (view) {
     //     case Views.CanvasView:
