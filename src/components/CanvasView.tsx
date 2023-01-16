@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'
 import { fabric } from 'fabric';
 import { API_IMAGES, API_WS } from '../constants';
@@ -10,26 +10,26 @@ import { ArtService, Artwork, FormVandalizedItem, } from '../client';
 //     didClose: (art: Artwork) => void
 // }
 
-type CanvasState = {
-    art: Artwork
-}
-
 function CanvasView(): JSX.Element {
     const navigate = useNavigate()
     const location = useLocation()
-
-    const { art } = location.state as CanvasState
+    const [artwork, setArtwork] = useState<Artwork>(location.state ? location.state.art : undefined)
 
     var socket: WebSocket
     var canvas: fabric.Canvas
 
     useEffect(() => {
+        if (!artwork) {
+            navigate("/")
+            return
+        }
+
         socket = initWebSocketClient()
         canvas = initCanvas()
-    }, [art])
+    }, [location.state])
 
     function initWebSocketClient() {
-        var socket = new WebSocket(API_WS + art.id)
+        var socket = new WebSocket(API_WS + artwork.id)
 
         socket.onopen = function (event) {
             console.log("Socket opened")
@@ -50,7 +50,7 @@ function CanvasView(): JSX.Element {
         selectRed()
 
         // Set canvas size based on the size of the base_layer image
-        const element = document.getElementById("layer-" + art.id)
+        const element = document.getElementById("layer-" + artwork.id)
         const rect = element!.getBoundingClientRect()
 
         // If element is not nil then use its dimensions for canvas
@@ -97,14 +97,14 @@ function CanvasView(): JSX.Element {
         canvas.freeDrawingBrush.color = "#0000FF";
     }
 
-    async function submitImage() {
+    async function submitImage(id: number) {
         // Create a binary string from canvas
         var img = canvas.toDataURL()
         var base64String = img.replace("data:", "").replace(/^.+,/, "")
 
         // Create a form and populate fields
         var formData = {} as FormVandalizedItem
-        formData.item_id = art.id
+        formData.item_id = id
         formData.user_id = 99
         formData.image_data = base64String
 
@@ -120,16 +120,20 @@ function CanvasView(): JSX.Element {
         }
     }
 
+    if (!artwork) {
+        return <div>Loading...</div>
+    }
+
     return (
         <div>
             <div className="canvas-container" >
-                {art.layers.reverse().map(layer => {
+                {artwork.layers.reverse().map(layer => {
                     return <img style={{ zIndex: layer.id }} className="canvas-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
                 })}
-                <canvas style={{ zIndex: art.id + 1 }} id="canvas-sheet" />
+                <canvas style={{ zIndex: artwork.id + 1 }} id="canvas-sheet" />
             </div>
             <div className="canvas-toolbar">
-                <button id="button-save" onClick={submitImage}>Save</button>
+                <button id="button-save" onClick={() => submitImage(artwork.id)}>Save</button>
                 <button id="button-red" onClick={selectRed}>Red</button>
                 <button id="button-green" onClick={selectGreen}>Green</button>
                 <button id="button-blue" onClick={selectBlue}>Blue</button>

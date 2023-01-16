@@ -14,10 +14,8 @@ type Params = {
 }
 
 function ImageView(): JSX.Element {
-    const { id } = useParams<Params>()
-
     const navigate = useNavigate()
-
+    const { id } = useParams<Params>()
     const [artwork, setArtwork] = useState<Artwork>()
 
     useEffect(() => {
