@@ -24,8 +24,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate-api-local": "openapi --input http://127.0.0.1:8000/openapi.json --output ./src/client --client axios",
-    "generate-api-remote": "openapi --input http://remote_url.com:8000/openapi.json --output ./src/client --client axios",
+    "generate-api-local": "openapi --input http://127.0.0.1:8080/openapi.json --output ./src/client --client axios",
+    "generate-api-remote": "openapi --input http://remote_url.com/openapi.json --output ./src/client --client axios",
     "start-local": "npm run generate-api-local & npm run start",
     "start-remote": "npm run generate-api-remote & npm run start"
   },
