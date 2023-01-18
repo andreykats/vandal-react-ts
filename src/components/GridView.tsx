@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'
 import CellView from './CellView';
-import RowView from './RowView';
 import { ArtService, Artwork } from '../client';
 
 
 function GridView(): JSX.Element {
+    const navigate = useNavigate()
     const [artworks, setArtworks] = useState<Artwork[]>([])
-    const [selected, setSelected] = useState<Artwork | undefined>()
 
     useEffect(() => {
         fetchFeed()
     }, [])
+
+    function onSelectArtwork(item_id: number) {
+        // Send params to the next page
+        navigate("/history/" + item_id)
+    }
 
     /**
     // 3 ways to fetch API data
@@ -53,34 +58,47 @@ function GridView(): JSX.Element {
         }
     }
 
-    if (selected) {
-        return (
-            <div>
-                <div className="heading">
-                    Decided to distroy "{selected.layers[0].name}", eh?
-                </div>
-                <div className="heading">
-                    You monster
-                </div>
-                <div>
-                    <RowView art={selected} didClose={() => (setSelected(undefined))} />
-                </div>
+    // if (selected) {
+    //     return (
+    //         <div>
+    //             <div className="heading">
+    //                 Decided to distroy "{selected.layers[0].name}", eh?
+    //             </div>
+    //             <div className="heading">
+    //                 You monster
+    //             </div>
+    //             <div>
+    //                 <RowView art={selected} didClose={() => (setSelected(undefined))} />
+    //             </div>
+    //         </div>
+    //     )
+    // } else {
+    //     return (
+    //         <div>
+    //             <div className="heading">
+    //                 Choose the beauty you wish to destroy
+    //             </div>
+    //             <div className="grid-container">
+    //                 {artworks.map(art => {
+    //                     return <CellView key={art.id} art={art} didSelect={() => setSelected(art)} />
+    //                 })}
+    //             </div>
+    //         </div>
+    //     )
+    // }
+
+    return (
+        <div>
+            <div className="heading">
+                Choose the beauty you wish to destroy
             </div>
-        )
-    } else {
-        return (
-            <div>
-                <div className="heading">
-                    Choose the beauty you wish to destroy
-                </div>
-                <div className="grid-container">
-                    {artworks.map(art => {
-                        return <CellView key={art.id} art={art} didSelect={() => setSelected(art)} />
-                    })}
-                </div>
+            <div className="grid-container">
+                {artworks.map(art => {
+                    return <CellView key={art.id} art={art} didSelect={() => (onSelectArtwork(art.id))} />
+                })}
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default GridView;
