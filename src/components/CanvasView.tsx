@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'
 import { fabric } from 'fabric';
 import { API_IMAGES, API_WS } from '../constants';
-import { ArtService, Artwork, FormVandalizedItem, } from '../client';
+import { ArtService, Artwork, FormVandalizedItem, FormActivateArtwork } from '../client';
 
 // interface CanvasProps {
 //     art: Artwork
@@ -26,17 +26,22 @@ function CanvasView(): JSX.Element {
 
         socket = initWebSocketClient()
         canvas = initCanvas()
+
+        return () => {
+            socket.close()
+            canvas.dispose()
+        }
     }, [location.state])
 
     function initWebSocketClient() {
         var socket = new WebSocket(API_WS + artwork.id)
 
         socket.onopen = function (event) {
-            console.log("Socket opened")
+            console.log("socket opened: ", artwork.id)
         }
 
         socket.onclose = function (event) {
-            console.error("Socket closed unexpectedly")
+            console.log("socket closed: ", artwork.id)
         }
 
         return socket
@@ -120,6 +125,22 @@ function CanvasView(): JSX.Element {
         }
     }
 
+    async function setArtworkInactive(id: number) {
+        // Create a form and populate fields
+        var formData = {} as FormActivateArtwork
+        formData.item_id = id
+        formData.is_active = false
+
+        // Submit using the auto-generated api client then try to catch any errors
+        try {
+            const response = await ArtService.artSetArtworkActive(formData)
+            selectHome()
+        } catch (error: any) {
+            console.log(error)
+            alert("Set artwork active error: " + error.message)
+        }
+    }
+
     if (!artwork) {
         return <div>Loading...</div>
     }
@@ -137,7 +158,7 @@ function CanvasView(): JSX.Element {
                 <button id="button-red" onClick={selectRed}>Red</button>
                 <button id="button-green" onClick={selectGreen}>Green</button>
                 <button id="button-blue" onClick={selectBlue}>Blue</button>
-                <button id="button-cancel" onClick={selectHome}>Cancel</button>
+                <button id="button-cancel" onClick={() => setArtworkInactive(artwork.id)}>Cancel</button>
             </div>
         </div>
     )

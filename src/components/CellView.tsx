@@ -10,59 +10,73 @@ interface CellProps {
 }
 
 function CellView(props: CellProps): JSX.Element {
-    // var socket: WebSocket
+    var socket: WebSocket
     var canvas: fabric.Canvas
 
     useEffect(() => {
-        // socket = initWebSocketClient()
+        if (props.art.is_active) {
+            socket = initWebSocketClient()
+        }
         canvas = initCanvas()
+
+        return () => {
+            if (props.art.is_active) {
+                socket.close()
+            }
+            canvas.dispose()
+        }
     }, [])
 
-    // function initWebSocketClient() {
-    //     var socket = new WebSocket(API_WS + props.art.id)
-    //     socket.onmessage = function (event) {
-    //         var data = JSON.parse(event.data)
-    //         console.log("Recieving: ", data)
+    function initWebSocketClient() {
+        var socket = new WebSocket(API_WS + props.art.id)
 
-    //         if (data.message.action == "clear") {
-    //             canvas.clear()
-    //             return
-    //         }
+        socket.onopen = function (event) {
+            console.log("socket opened: ", props.art.id)
+        }
 
-    //         var reductionFactor = data.message.canvasSize.width / canvas.getWidth()
-    //         var drawInstruction = data.message.drawInstruction
+        socket.onmessage = function (event) {
+            var data = JSON.parse(event.data)
+            console.log("socket recieving: ", data)
 
-    //         // Modify the coordinate path to fit the new canvas dimensions of a cell
-    //         var pathCoordinates = drawInstruction.pathCoordinates
-    //             .map(function (item: any) {
-    //                 var newItem = item.map(function (coordinate: any) {
-    //                     // Skip first item in array
-    //                     if (item.indexOf(coordinate) > 0) {
-    //                         return coordinate / reductionFactor
-    //                     } else {
-    //                         // Return first item in array unchanged
-    //                         return coordinate
-    //                     }
-    //                 })
-    //                 // Join the array into a string as per FabricJS path format
-    //                 return newItem.join(" ");
-    //             })
-    //             .join(" ")
+            if (data.message.action == "clear") {
+                canvas.clear()
+                return
+            }
 
-    //         var path = new fabric.Path(pathCoordinates, {
-    //             stroke: drawInstruction.stroke,
-    //             strokeWidth: drawInstruction.strokeWidth / reductionFactor,
-    //             fill: drawInstruction.fill
-    //         })
-    //         canvas.add(path)
-    //     }
+            var reductionFactor = data.message.canvasSize.width / canvas.getWidth()
+            var drawInstruction = data.message.drawInstruction
 
-    //     socket.onclose = function (event) {
-    //         console.error("Chat socket closed unexpectedly")
-    //     }
+            // Modify the coordinate path to fit the new canvas dimensions of a cell
+            var pathCoordinates = drawInstruction.pathCoordinates
+                .map(function (item: any) {
+                    var newItem = item.map(function (coordinate: any) {
+                        // Skip first item in array
+                        if (item.indexOf(coordinate) > 0) {
+                            return coordinate / reductionFactor
+                        } else {
+                            // Return first item in array unchanged
+                            return coordinate
+                        }
+                    })
+                    // Join the array into a string as per FabricJS path format
+                    return newItem.join(" ");
+                })
+                .join(" ")
 
-    //     return socket
-    // }
+            var path = new fabric.Path(pathCoordinates, {
+                stroke: drawInstruction.stroke,
+                strokeWidth: drawInstruction.strokeWidth / reductionFactor,
+                fill: drawInstruction.fill
+            })
+            canvas.add(path)
+        }
+
+        socket.onclose = function (event) {
+            console.log("socket closed: ", props.art.id)
+        }
+
+        return socket
+    }
 
     function initCanvas() {
         canvas = new fabric.Canvas("canvas-" + props.art.id)

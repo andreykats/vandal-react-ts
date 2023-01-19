@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import CellView from './CellView';
 // import ImageView from './ImageView';
 // import CanvasView from './CanvasView';
-import { ArtService, Artwork } from '../client';
+import { ArtService, Artwork, FormActivateArtwork } from '../client';
 
 // export enum Views {
 //     HistoryView,
@@ -45,14 +45,25 @@ function HistoryView(): JSX.Element {
         }
     }
 
+    async function setArtworkActive(id: number) {
+        // Create a form and populate fields
+        var formData = {} as FormActivateArtwork
+        formData.item_id = id
+        formData.is_active = true
+
+        // Submit using the auto-generated api client then try to catch any errors
+        try {
+            const response = await ArtService.artSetArtworkActive(formData)
+            navigate('/edit/', { state: { art: response } })
+        } catch (error: any) {
+            console.log(error)
+            alert("Set artwork active error: " + error.message)
+        }
+    }
+
     function selectViewArtwork(item_id: number) {
         // Send params to the next page
         navigate("/view/" + item_id)
-    }
-
-    function selectEditArtwork(art: Artwork) {
-        // Send state object to the next page
-        navigate('/edit/', { state: { art: art } })
     }
 
     // switch (view) {
@@ -79,7 +90,7 @@ function HistoryView(): JSX.Element {
     return (
         <div className="row-container">
             <div className="row-button-stack">
-                <button id="button-new" onClick={() => selectEditArtwork(artworks[0])}> NEW </button>
+                <button id="button-new" onClick={() => setArtworkActive(artworks[0].id)}> NEW </button>
             </div>
             <div className="row-container">
                 {artworks.map(art => {
