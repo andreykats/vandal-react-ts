@@ -2,15 +2,45 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'
 import CellView from './CellView';
 import { ArtService, Artwork } from '../client';
+import { API_WS_BROADCAST } from '../constants';
 
 
 function GridView(): JSX.Element {
     const navigate = useNavigate()
     const [artworks, setArtworks] = useState<Artwork[]>([])
 
+    var socket: WebSocket
+
     useEffect(() => {
         fetchFeed()
+        socket = initWebSocketClient(API_WS_BROADCAST)
+
+        return () => {
+            if (socket.OPEN) {
+                socket.close()
+            }
+        }
     }, [])
+
+    function initWebSocketClient(url: string) {
+        var socket = new WebSocket(url)
+
+        socket.onopen = function (event) {
+            console.log("socket opened: ", url)
+        }
+
+        socket.onmessage = function (event) {
+            var data = JSON.parse(event.data)
+            console.log("socket recieving: ", data)
+            fetchFeed()
+        }
+
+        socket.onclose = function (event) {
+            console.log("socket closed: ", url)
+        }
+
+        return socket
+    }
 
     function onSelectArtwork(item_id: number) {
         // Send params to the next page

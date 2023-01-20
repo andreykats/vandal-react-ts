@@ -1,15 +1,16 @@
 import { Route, Routes } from "react-router-dom"
 import './App.css';
 import { OpenAPI } from './client';
+import { API_URL } from './constants';
 
 import Layout from './Layout';
-import Nopage from './components/Nopage';
+import NotFound from './NotFound';
 import GridView from './components/GridView';
 import HistoryView from "./components/HistoryView";
 import ImageView from './components/ImageView';
 import CanvasView from './components/CanvasView';
 
-OpenAPI.BASE = 'http://localhost:8080'
+OpenAPI.BASE = API_URL
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
         <Route path="/history/:id" element={<HistoryView />} />
         <Route path="/view/:id" element={<ImageView />} />
         <Route path="/edit/" element={<CanvasView />} />
-        <Route path="*" element={<Nopage />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   )
