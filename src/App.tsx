@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom"
 import './App.css';
 import { OpenAPI } from './client';
+import { API_URL } from './constants';
 
 import Layout from './Layout';
 import NotFound from './NotFound';
@@ -9,7 +10,7 @@ import HistoryView from "./components/HistoryView";
 import ImageView from './components/ImageView';
 import CanvasView from './components/CanvasView';
 
-OpenAPI.BASE = 'http://localhost:8080'
+OpenAPI.BASE = API_URL
 
 function App() {
   return (
