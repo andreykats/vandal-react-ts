@@ -16,7 +16,11 @@ type Params = {
 function ImageView(): JSX.Element {
     const navigate = useNavigate()
     const { id } = useParams<Params>()
-    const [artwork, setArtwork] = useState<Artwork>()
+    const [artwork, setArtwork] = useState<Artwork | undefined>()
+
+    var canvas: fabric.Canvas
+
+    var desiredWidth = 800
 
     useEffect(() => {
         if (!id) {
@@ -25,6 +29,12 @@ function ImageView(): JSX.Element {
         }
         fetchArtwork(parseInt(id))
     }, [id])
+
+    function adjustSize(dimension: number) {
+        if (!artwork) { return }
+        var reductionFactor = artwork.width / desiredWidth
+        return dimension / reductionFactor
+    }
 
     async function fetchArtwork(id: number) {
         try {
@@ -44,10 +54,13 @@ function ImageView(): JSX.Element {
     }
 
     return (
-        <div className="canvas-container">
-            {artwork.layers.map(layer => {
-                return <img style={{ zIndex: layer.id }} className="canvas-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
-            })}
+        <div className="canvas-stack">
+            <div style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height) }}>
+                {artwork.layers.map(layer => {
+                    return <img className="canvas-image" style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height), zIndex: layer.id }} key={layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
+                })}
+            </div>
+
         </div>
     )
 }

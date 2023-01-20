@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { fabric } from 'fabric';
 import { API_IMAGES, API_WS } from '../constants';
 import { ArtService, Artwork, FormVandalizedItem, FormActivateArtwork } from '../client';
+import { relative } from 'path';
 
 // interface CanvasProps {
 //     art: Artwork
@@ -18,30 +19,39 @@ function CanvasView(): JSX.Element {
     var socket: WebSocket
     var canvas: fabric.Canvas
 
+    var desiredCanvasWidth = 800
+
     useEffect(() => {
         if (!artwork) {
             navigate("/")
             return
         }
 
-        socket = initWebSocketClient()
+        socket = initWebSocketClient(API_WS + artwork.id)
         canvas = initCanvas()
 
         return () => {
-            socket.close()
+            if (socket && socket.OPEN) {
+                socket.close()
+            }
             canvas.dispose()
         }
     }, [location.state])
 
-    function initWebSocketClient() {
-        var socket = new WebSocket(API_WS + artwork.id)
+    function adjustSize(dimension: number) {
+        var reductionFactor = artwork.width / desiredCanvasWidth
+        return dimension / reductionFactor
+    }
+
+    function initWebSocketClient(url: string) {
+        var socket = new WebSocket(url)
 
         socket.onopen = function (event) {
-            console.log("socket opened: ", artwork.id)
+            console.log("socket opened: ", url)
         }
 
         socket.onclose = function (event) {
-            console.log("socket closed: ", artwork.id)
+            console.log("socket closed: ", url)
         }
 
         return socket
@@ -51,18 +61,9 @@ function CanvasView(): JSX.Element {
         canvas = new fabric.Canvas('canvas-sheet')
         canvas.isDrawingMode = true
         canvas.freeDrawingBrush.width = 10
+        canvas.setDimensions({ width: adjustSize(artwork.width), height: adjustSize(artwork.height) })
 
         selectRed()
-
-        // Set canvas size based on the size of the base_layer image
-        const element = document.getElementById("layer-" + artwork.id)
-        const rect = element!.getBoundingClientRect()
-
-        // If element is not nil then use its dimensions for canvas
-        if (rect) {
-            canvas.setWidth(rect.width)
-            canvas.setHeight(rect.height)
-        }
 
         canvas.on("path:created", function (e: any) {
             var drawInstruction = {
@@ -147,12 +148,15 @@ function CanvasView(): JSX.Element {
 
     return (
         <div>
-            <div className="canvas-container" >
-                {artwork.layers.reverse().map(layer => {
-                    return <img style={{ zIndex: layer.id }} className="canvas-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
-                })}
-                <canvas style={{ zIndex: artwork.id + 1 }} id="canvas-sheet" />
+            <div className="canvas-stack">
+                <div style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height) }}>
+                    {artwork.layers.reverse().map(layer => {
+                        return <img className="canvas-image" style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height), zIndex: layer.id }} key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
+                    })}
+                    <canvas style={{ zIndex: artwork.id + 1 }} id="canvas-sheet" />
+                </div>
             </div>
+
             <div className="canvas-toolbar">
                 <button id="button-save" onClick={() => submitImage(artwork.id)}>Save</button>
                 <button id="button-red" onClick={selectRed}>Red</button>

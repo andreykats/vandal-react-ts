@@ -3,7 +3,7 @@ import './App.css';
 import { OpenAPI } from './client';
 
 import Layout from './Layout';
-import Nopage from './components/Nopage';
+import NotFound from './NotFound';
 import GridView from './components/GridView';
 import HistoryView from "./components/HistoryView";
 import ImageView from './components/ImageView';
@@ -19,7 +19,7 @@ function App() {
         <Route path="/history/:id" element={<HistoryView />} />
         <Route path="/view/:id" element={<ImageView />} />
         <Route path="/edit/" element={<CanvasView />} />
-        <Route path="*" element={<Nopage />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   )

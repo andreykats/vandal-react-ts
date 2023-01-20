@@ -13,25 +13,39 @@ function CellView(props: CellProps): JSX.Element {
     var socket: WebSocket
     var canvas: fabric.Canvas
 
-    useEffect(() => {
-        if (props.art.is_active) {
-            socket = initWebSocketClient()
-        }
-        canvas = initCanvas()
+    var desiredCellWidth = 500
 
+    useEffect(() => {
+        canvas = initCanvas()
+        if (props.art.is_active) {
+            socket = initWebSocketClient(API_WS + props.art.id)
+        }
         return () => {
-            if (props.art.is_active) {
+            if (socket && socket.OPEN) {
                 socket.close()
             }
             canvas.dispose()
         }
-    }, [])
+    }, [props.art])
 
-    function initWebSocketClient() {
-        var socket = new WebSocket(API_WS + props.art.id)
+    function adjustSize(dimension: number) {
+        var reductionFactor = props.art.width / desiredCellWidth
+        return dimension / reductionFactor
+    }
+
+    function initCanvas() {
+        canvas = new fabric.Canvas("canvas-" + props.art.id)
+        canvas.isDrawingMode = false
+        canvas.freeDrawingBrush.width = 10
+        canvas.setDimensions({ width: adjustSize(props.art.width), height: adjustSize(props.art.height) })
+        return canvas
+    }
+
+    function initWebSocketClient(url: string) {
+        var socket = new WebSocket(url)
 
         socket.onopen = function (event) {
-            console.log("socket opened: ", props.art.id)
+            console.log("socket opened: ", url)
         }
 
         socket.onmessage = function (event) {
@@ -72,38 +86,20 @@ function CellView(props: CellProps): JSX.Element {
         }
 
         socket.onclose = function (event) {
-            console.log("socket closed: ", props.art.id)
+            console.log("socket closed: ", url)
         }
 
         return socket
     }
 
-    function initCanvas() {
-        canvas = new fabric.Canvas("canvas-" + props.art.id)
-        canvas.freeDrawingBrush.width = 10
-
-        const element = document.getElementById("layer-" + props.art.id)
-        const rect = element?.getBoundingClientRect()
-
-        // If element is not nil then use its dimensions for canvas
-        if (rect) {
-            canvas.setWidth(rect.width)
-            canvas.setHeight(rect.height)
-        }
-
-        canvas.renderAll()
-        return canvas
-    }
-
-
     return (
-        <div className="cell-container" onClick={() => props.didSelect(props.art)}>
+        <div className={props.art.is_active ? "cell-container-active" : "cell-container"} style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height) }} onClick={() => props.didSelect(props.art)}>
             {props.art.layers.reverse().map(layer => {
-                return <img style={{ zIndex: layer.id }} className="cell-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
+                return <img style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height), zIndex: layer.id }} className="cell-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
             })}
             <canvas style={{ zIndex: props.art.id + 1 }} id={"canvas-" + props.art.id} />
         </div>
     )
 }
 
-export default CellView;
+export default CellView

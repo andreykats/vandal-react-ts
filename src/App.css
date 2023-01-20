@@ -41,21 +41,25 @@
 .cell-container {
   display: flex;
   flex-direction: column;
-  /* min-height: 100vh; */
-  /* width: 500px; */
   position: relative;
   margin: 10px;
 }
 
-.cell-image {
-  position: absolute;
-  width: 500px;
+.cell-container-active {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin: 10px;
+  border: 20px solid rgb(255, 0, 0);
 }
 
-.canvas-container {
+.cell-image {
+  position: absolute;
+}
+
+.canvas-stack {
   display: flex;
   justify-content: center;
-  position: relative;
 }
 
 .canvas-image {

@@ -4,9 +4,11 @@ const Layout = () => {
     return (
         <div>
             <div className="title">
-                Welcome you stinkin' Vandal
+                Welcome you stinkin' vandal
             </div>
-            <div>
+            <div className="heading">
+                <Link to="/about">About Us</Link>
+                <span> | </span>
                 <Link to="/contact">Contact</Link>
             </div>
             <div>
@@ -16,4 +18,4 @@ const Layout = () => {
     )
 }
 
-export default Layout;
+export default Layout
