@@ -42,7 +42,7 @@ function GridView(): JSX.Element {
         return socket
     }
 
-    function onSelectArtwork(item_id: number) {
+    function onSelectArtwork(item_id: string) {
         // Send params to the next page
         navigate("/history/" + item_id)
     }
@@ -79,7 +79,7 @@ function GridView(): JSX.Element {
     // Third method (using the OpenAPI Client) try/catch method
     async function fetchFeed() {
         try {
-            const response = await ArtService.artGetFeedItems()
+            const response = await ArtService.artGetLatestArtworks()
             console.log("fetchFeed: ", response)
             setArtworks(response)
         } catch (error: any) {

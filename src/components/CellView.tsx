@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Artwork } from '../client';
+import { Artwork, Layer } from '../client';
 import { API_IMAGES, API_WS } from '../constants';
 import { fabric } from 'fabric';
 
@@ -31,6 +31,13 @@ function CellView(props: CellProps): JSX.Element {
     function adjustSize(dimension: number) {
         var reductionFactor = props.art.width / desiredCellWidth
         return dimension / reductionFactor
+    }
+
+    function imageSource(layer: Layer) {
+        if (layer.file_name) {
+            return API_IMAGES + layer.file_name
+        }
+        return API_IMAGES + layer.id + ".jpg"
     }
 
     function initCanvas() {
@@ -95,7 +102,7 @@ function CellView(props: CellProps): JSX.Element {
     return (
         <div className={props.art.is_active ? "cell-container-active" : "cell-container"} style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height) }} onClick={() => props.didSelect(props.art)}>
             {props.art.layers.reverse().map(layer => {
-                return <img style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height), zIndex: layer.id }} className="cell-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
+                return <img style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height), zIndex: layer.id }} className="cell-image" key={layer.id} id={"layer-" + layer.id} src={imageSource(layer)} alt="" />
             })}
             <canvas style={{ zIndex: props.art.id + 1 }} id={"canvas-" + props.art.id} />
         </div>
