@@ -49,6 +49,9 @@ function ImageView(): JSX.Element {
             const response = await ArtService.artGetArtwork(id)
             console.log("fetchArtwork: ", response)
             setArtwork(response)
+
+            // get last path component
+
         } catch (error: any) {
             console.error(error)
             alert("fetchArtwork Error: " + error.message)

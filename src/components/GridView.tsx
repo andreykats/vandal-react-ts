@@ -9,16 +9,29 @@ function GridView(): JSX.Element {
     const navigate = useNavigate()
     const [artworks, setArtworks] = useState<Artwork[]>([])
 
-    var socket: WebSocket
+    // var socket: WebSocket
+    const evtSource = new EventSource("http://127.0.0.1:8080/live/stream");
 
     useEffect(() => {
         fetchFeed()
-        socket = initWebSocketClient(API_WS_BROADCAST)
+        // socket = initWebSocketClient(API_WS_BROADCAST)
+
+        evtSource.addEventListener("new_message", function (event) {
+            // Logic to handle status updates
+            console.log(event.data)
+        })
+
+        evtSource.addEventListener("end_event", function (event) {
+            console.log(event.data)
+            evtSource.close()
+        })
 
         return () => {
-            if (socket.OPEN) {
-                socket.close()
-            }
+            // if (socket.OPEN) {
+            //     socket.close()
+            // }
+
+            evtSource.close()
         }
     }, [])
 

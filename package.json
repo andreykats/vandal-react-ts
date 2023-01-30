@@ -35,8 +35,8 @@
     "openapi:dev": "dotenv -e .env.development -- cross-var openapi --input %REACT_APP_OPENAPI% --output ./src/client --client axios",
     "openapi:stage": "dotenv -e .env.staging -- cross-var openapi --input %REACT_APP_OPENAPI% --output ./src/client --client axios",
     "openapi:prod": "dotenv -e .env.production -- cross-var openapi --input %REACT_APP_OPENAPI% --output ./src/client --client axios",
-    "upload:stage": "dotenv -e .env.staging -- cross-var aws s3 sync build/ %REACT_APP_S3_BUCKET%",
-    "upload:prod": "dotenv -e .env.production -- cross-var aws s3 sync build/ %REACT_APP_S3_BUCKET%",
+    "upload:stage": "dotenv -e .env.staging -- cross-var aws s3 sync build/ %REACT_APP_S3_FRONTEND%",
+    "upload:prod": "dotenv -e .env.production -- cross-var aws s3 sync build/ %REACT_APP_S3_FRONTEND%",
     "deploy:stage": "npm run openapi:stage && npm run build:stage && npm run upload:stage",
     "deploy:prod": "npm run openapi:prod && npm run build:prod && npm run upload:prod"
   },
