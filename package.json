@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@hookform/resolvers": "^2.9.11",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -11,23 +12,37 @@
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.10",
     "axios": "^1.2.1",
+    "bootstrap": "^5.2.3",
+    "cross-var": "^1.1.0",
+    "dotenv-cli": "^7.0.0",
     "fabric": "^5.3.0",
     "openapi-typescript-codegen": "^0.23.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.1",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.4",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "yup": "^1.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "dev": "npm run openapi:dev & npm run start:dev",
+    "stage": "npm run openapi:stage & npm run start:stage",
+    "prod": "npm run openapi:prod & npm run start:prod",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate-api-local": "openapi --input http://127.0.0.1:8080/openapi.json --output ./src/client --client axios",
-    "generate-api-remote": "openapi --input http://remote_url.com/openapi.json --output ./src/client --client axios",
-    "start-local": "npm run generate-api-local & npm run start",
-    "start-remote": "npm run generate-api-remote & npm run start"
+    "start:dev": "dotenv -e .env.development react-scripts start",
+    "start:stage": "dotenv -e .env.staging react-scripts start",
+    "start:prod": "dotenv -e .env.production react-scripts start",
+    "build:stage": "dotenv -e .env.staging react-scripts build",
+    "build:prod": "dotenv -e .env.production react-scripts build",
+    "openapi:dev": "dotenv -e .env.development -- cross-var openapi --input %REACT_APP_OPENAPI% --output ./src/client --client axios",
+    "openapi:stage": "dotenv -e .env.staging -- cross-var openapi --input %REACT_APP_OPENAPI% --output ./src/client --client axios",
+    "openapi:prod": "dotenv -e .env.production -- cross-var openapi --input %REACT_APP_OPENAPI% --output ./src/client --client axios",
+    "upload:stage": "dotenv -e .env.staging -- cross-var aws s3 sync build/ %REACT_APP_S3_FRONTEND%",
+    "upload:prod": "dotenv -e .env.production -- cross-var aws s3 sync build/ %REACT_APP_S3_FRONTEND%",
+    "deploy:stage": "npm run openapi:stage && npm run build:stage && npm run upload:stage",
+    "deploy:prod": "npm run openapi:prod && npm run build:prod && npm run upload:prod"
   },
   "eslintConfig": {
     "extends": [

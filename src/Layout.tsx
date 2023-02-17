@@ -1,15 +1,43 @@
+import { useState, useEffect } from 'react';
 import { Outlet, Link } from "react-router-dom";
+import { OpenAPI } from './client';
 
-const Layout = () => {
+export default function Layout(): JSX.Element {
+    const [isLoggedIn, setLoggedIn] = useState<boolean>()
+
+    useEffect(() => {
+        if (localStorage.getItem('token')) {
+            setLoggedIn(true)
+        } else {
+            setLoggedIn(false)
+        }
+    }, [])
+
+    function logout() {
+        localStorage.removeItem('token')
+        OpenAPI.TOKEN = ""
+    }
+
     return (
         <div>
             <div className="title">
-                Welcome you stinkin' vandal
+                VANDAL
             </div>
             <div className="heading">
+                <Link to="/">Home</Link>
+                <span> | </span>
                 <Link to="/about">About Us</Link>
                 <span> | </span>
-                <Link to="/contact">Contact</Link>
+                {isLoggedIn &&
+                    <span>
+                        <Link to="/account">Account</Link>
+                        <span> | </span>
+                        <a href="/" onClick={logout}>Logout</a>
+                    </span>
+                }
+                {!isLoggedIn &&
+                    <Link to="/login">Login</Link>
+                }
             </div>
             <div>
                 <Outlet />
@@ -17,5 +45,3 @@ const Layout = () => {
         </div>
     )
 }
-
-export default Layout

@@ -4,8 +4,7 @@ import CellView from './CellView';
 import { ArtService, Artwork } from '../client';
 import { API_WS_BROADCAST } from '../constants';
 
-
-function GridView(): JSX.Element {
+export default function GridView(): JSX.Element {
     const navigate = useNavigate()
     const [artworks, setArtworks] = useState<Artwork[]>([])
 
@@ -13,7 +12,9 @@ function GridView(): JSX.Element {
 
     useEffect(() => {
         fetchFeed()
-        socket = initWebSocketClient(API_WS_BROADCAST)
+        if (API_WS_BROADCAST) {
+            socket = initWebSocketClient(API_WS_BROADCAST)
+        }
 
         return () => {
             if (socket.OPEN) {
@@ -42,7 +43,7 @@ function GridView(): JSX.Element {
         return socket
     }
 
-    function onSelectArtwork(item_id: number) {
+    function onSelectArtwork(item_id: string) {
         // Send params to the next page
         navigate("/history/" + item_id)
     }
@@ -79,7 +80,7 @@ function GridView(): JSX.Element {
     // Third method (using the OpenAPI Client) try/catch method
     async function fetchFeed() {
         try {
-            const response = await ArtService.artGetFeedItems()
+            const response = await ArtService.artGetLatestArtworks()
             console.log("fetchFeed: ", response)
             setArtworks(response)
         } catch (error: any) {
@@ -130,5 +131,3 @@ function GridView(): JSX.Element {
         </div>
     )
 }
-
-export default GridView;

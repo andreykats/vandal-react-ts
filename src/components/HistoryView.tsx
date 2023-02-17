@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import CellView from './CellView';
 // import ImageView from './ImageView';
 // import CanvasView from './CanvasView';
-import { ArtService, Artwork, FormActivateArtwork } from '../client';
+import { ArtService, Artwork, FormActivate } from '../client';
 
 // export enum Views {
 //     HistoryView,
@@ -31,12 +31,12 @@ function HistoryView(): JSX.Element {
             navigate("/nopage/")
             return
         }
-        fetchHistory(parseInt(id))
+        fetchHistory(id)
     }, [id])
 
-    async function fetchHistory(item_id: number) {
+    async function fetchHistory(id: string) {
         try {
-            const response = await ArtService.artGetArtworkHistory(item_id)
+            const response = await ArtService.artGetArtworkHistory(id)
             console.log("fetchHistory: ", response)
             setArtwork(response)
         } catch (error: any) {
@@ -45,15 +45,16 @@ function HistoryView(): JSX.Element {
         }
     }
 
-    async function setArtworkActive(id: number) {
+    async function setArtworkActive(id: string) {
         // Create a form and populate fields
-        var formData = {} as FormActivateArtwork
-        formData.item_id = id
+        var formData = {} as FormActivate
+        formData.layer_id = id
         formData.is_active = true
 
         // Submit using the auto-generated api client then try to catch any errors
         try {
             const response = await ArtService.artSetArtworkActive(formData)
+            console.log("setArtworkActive: ", response)
             navigate('/edit/', { state: { art: response } })
         } catch (error: any) {
             console.log(error)
@@ -61,9 +62,9 @@ function HistoryView(): JSX.Element {
         }
     }
 
-    function selectViewArtwork(item_id: number) {
+    function selectViewArtwork(id: string) {
         // Send params to the next page
-        navigate("/view/" + item_id)
+        navigate("/view/" + id)
     }
 
     // switch (view) {

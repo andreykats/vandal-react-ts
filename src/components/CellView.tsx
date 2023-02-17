@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Artwork } from '../client';
+import { Artwork, Layer } from '../client';
 import { API_IMAGES, API_WS } from '../constants';
 import { fabric } from 'fabric';
 
@@ -18,7 +18,7 @@ function CellView(props: CellProps): JSX.Element {
     useEffect(() => {
         canvas = initCanvas()
         if (props.art.is_active) {
-            socket = initWebSocketClient(API_WS + props.art.id)
+            socket = initWebSocketClient(API_WS + "?channel=" + props.art.id)
         }
         return () => {
             if (socket && socket.OPEN) {
@@ -31,6 +31,13 @@ function CellView(props: CellProps): JSX.Element {
     function adjustSize(dimension: number) {
         var reductionFactor = props.art.width / desiredCellWidth
         return dimension / reductionFactor
+    }
+
+    function imageSource(layer: Layer) {
+        if (layer.file_name) {
+            return API_IMAGES + layer.file_name
+        }
+        return API_IMAGES + layer.id + ".jpg"
     }
 
     function initCanvas() {
@@ -49,16 +56,15 @@ function CellView(props: CellProps): JSX.Element {
         }
 
         socket.onmessage = function (event) {
-            var data = JSON.parse(event.data)
-            console.log("socket recieving: ", data)
-
-            if (data.message.action == "clear") {
+            var message = JSON.parse(event.data).payload.message
+            // console.log("socket recieving: ", data.payload)
+            if (message.action == "clear") {
                 canvas.clear()
                 return
             }
 
-            var reductionFactor = data.message.canvasSize.width / canvas.getWidth()
-            var drawInstruction = data.message.drawInstruction
+            var reductionFactor = message.canvasSize.width / canvas.getWidth()
+            var drawInstruction = message.drawInstruction
 
             // Modify the coordinate path to fit the new canvas dimensions of a cell
             var pathCoordinates = drawInstruction.pathCoordinates
@@ -95,7 +101,7 @@ function CellView(props: CellProps): JSX.Element {
     return (
         <div className={props.art.is_active ? "cell-container-active" : "cell-container"} style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height) }} onClick={() => props.didSelect(props.art)}>
             {props.art.layers.reverse().map(layer => {
-                return <img style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height), zIndex: layer.id }} className="cell-image" key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
+                return <img style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height), zIndex: layer.id }} className="cell-image" key={layer.id} id={"layer-" + layer.id} src={imageSource(layer)} alt="" />
             })}
             <canvas style={{ zIndex: props.art.id + 1 }} id={"canvas-" + props.art.id} />
         </div>

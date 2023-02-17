@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'
 import { fabric } from 'fabric';
 import { API_IMAGES, API_WS } from '../constants';
-import { ArtService, Artwork, FormVandalizedItem, FormActivateArtwork } from '../client';
+import { ArtService, Artwork, FormNewLayer, FormActivate, Layer } from '../client';
 import { relative } from 'path';
 
 // interface CanvasProps {
@@ -14,6 +14,7 @@ import { relative } from 'path';
 function CanvasView(): JSX.Element {
     const navigate = useNavigate()
     const location = useLocation()
+    console.log("State: ", location.state)
     const [artwork, setArtwork] = useState<Artwork>(location.state ? location.state.art : undefined)
 
     var socket: WebSocket
@@ -23,11 +24,12 @@ function CanvasView(): JSX.Element {
 
     useEffect(() => {
         if (!artwork) {
+            console.log("CanvasView: no artwork")
             navigate("/")
             return
         }
 
-        socket = initWebSocketClient(API_WS + artwork.id)
+        socket = initWebSocketClient(API_WS + "?channel=" + artwork.id)
         canvas = initCanvas()
 
         return () => {
@@ -41,6 +43,14 @@ function CanvasView(): JSX.Element {
     function adjustSize(dimension: number) {
         var reductionFactor = artwork.width / desiredCanvasWidth
         return dimension / reductionFactor
+    }
+
+    function imageSource(layer: Layer) {
+        console.log("imageSource: ", layer)
+        if (layer.file_name) {
+            return API_IMAGES + layer.file_name
+        }
+        return API_IMAGES + layer.id + ".jpg"
     }
 
     function initWebSocketClient(url: string) {
@@ -74,10 +84,14 @@ function CanvasView(): JSX.Element {
             }
 
             var data = JSON.stringify({
-                message: {
-                    action: "draw",
-                    canvasSize: { width: canvas.width, height: canvas.height },
-                    drawInstruction: drawInstruction
+                action: "sendmessage",
+                payload: {
+                    channel: artwork.id,
+                    message: {
+                        action: "draw",
+                        canvasSize: { width: canvas.width, height: canvas.height },
+                        drawInstruction: drawInstruction
+                    }
                 }
             })
 
@@ -103,20 +117,20 @@ function CanvasView(): JSX.Element {
         canvas.freeDrawingBrush.color = "#0000FF";
     }
 
-    async function submitImage(id: number) {
+    async function submitImage(id: string) {
         // Create a binary string from canvas
         var img = canvas.toDataURL()
         var base64String = img.replace("data:", "").replace(/^.+,/, "")
 
         // Create a form and populate fields
-        var formData = {} as FormVandalizedItem
-        formData.item_id = id
-        formData.user_id = 99
+        var formData = {} as FormNewLayer
+        formData.layer_id = id
+        formData.user_id = "99"
         formData.image_data = base64String
 
         // Submit using the auto-generated api client then try to catch any errors
         try {
-            const response = await ArtService.artCreateVandalizedItem(formData)
+            const response = await ArtService.artSubmitNewLayer(formData)
             console.log("Submit img resquest: ", formData)
             console.log("Sumbit img response: ", response)
             selectHome()
@@ -126,10 +140,10 @@ function CanvasView(): JSX.Element {
         }
     }
 
-    async function setArtworkInactive(id: number) {
+    async function setArtworkInactive(id: string) {
         // Create a form and populate fields
-        var formData = {} as FormActivateArtwork
-        formData.item_id = id
+        var formData = {} as FormActivate
+        formData.layer_id = id
         formData.is_active = false
 
         // Submit using the auto-generated api client then try to catch any errors
@@ -151,9 +165,9 @@ function CanvasView(): JSX.Element {
             <div className="canvas-stack">
                 <div style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height) }}>
                     {artwork.layers.reverse().map(layer => {
-                        return <img className="canvas-image" style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height), zIndex: layer.id }} key={layer.id} id={"layer-" + layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
+                        return <img className="canvas-image" style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height), zIndex: 1 }} key={layer.id} id={"layer-" + layer.id} src={imageSource(layer)} alt="" />
                     })}
-                    <canvas style={{ zIndex: artwork.id + 1 }} id="canvas-sheet" />
+                    <canvas style={{ zIndex: 1 + 1 }} id="canvas-sheet" />
                 </div>
             </div>
 

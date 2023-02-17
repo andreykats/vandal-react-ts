@@ -1,6 +1,5 @@
-export const API_IP_PORT = "localhost:8080"
-export const API_URL = "http://" + API_IP_PORT
-export const API_WS = "ws://" + API_IP_PORT + "/live/"
+export const API_URL = process.env.REACT_APP_DOMAIN || "NOT_SET"
+export const API_WS = process.env.REACT_APP_SOCKET || "NOT_SET"
 export const API_WS_BROADCAST = API_WS
-export const API_IMAGES = API_URL + "/images/"
+export const API_IMAGES = process.env.REACT_APP_S3_IMAGES || "NOT_SET"
 export const API_SUBMIT = API_URL + "/art/submit/"

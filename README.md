@@ -1,9 +1,12 @@
 # Vandal {working title} Frontend
 
 ## Requirements
-Node 19.3
+### Local
+* Node 19.3
+* AWS CLI
 
-https://nodejs.org/en/download/current/
+### Remote
+* AWS S3
 
 ## Download
 Open terminal and run:

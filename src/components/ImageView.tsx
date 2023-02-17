@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArtService, Artwork } from '../client';
+import { ArtService, Artwork, Layer } from '../client';
 import { API_IMAGES } from '../constants';
 
 // interface ImageProps {
@@ -27,7 +27,7 @@ function ImageView(): JSX.Element {
             navigate("/nopage/")
             return
         }
-        fetchArtwork(parseInt(id))
+        fetchArtwork(id)
     }, [id])
 
     function adjustSize(dimension: number) {
@@ -36,11 +36,22 @@ function ImageView(): JSX.Element {
         return dimension / reductionFactor
     }
 
-    async function fetchArtwork(id: number) {
+    function imageSource(layer: Layer) {
+        console.log("imageSource: ", layer)
+        if (layer.file_name) {
+            return API_IMAGES + layer.file_name
+        }
+        return API_IMAGES + layer.id + ".jpg"
+    }
+
+    async function fetchArtwork(id: string) {
         try {
             const response = await ArtService.artGetArtwork(id)
             console.log("fetchArtwork: ", response)
             setArtwork(response)
+
+            // get last path component
+
         } catch (error: any) {
             console.error(error)
             alert("fetchArtwork Error: " + error.message)
@@ -57,10 +68,9 @@ function ImageView(): JSX.Element {
         <div className="canvas-stack">
             <div style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height) }}>
                 {artwork.layers.map(layer => {
-                    return <img className="canvas-image" style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height), zIndex: layer.id }} key={layer.id} src={API_IMAGES + layer.id + ".jpg"} alt="" />
+                    return <img className="canvas-image" style={{ width: adjustSize(artwork.width), height: adjustSize(artwork.height), zIndex: layer.id }} key={layer.id} src={imageSource(layer)} alt="" />
                 })}
             </div>
-
         </div>
     )
 }
