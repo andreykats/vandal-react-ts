@@ -29,7 +29,7 @@ function CanvasView(): JSX.Element {
             return
         }
 
-        socket = initWebSocketClient(API_WS + artwork.id)
+        socket = initWebSocketClient(API_WS + "?channel=" + artwork.id)
         canvas = initCanvas()
 
         return () => {
@@ -84,10 +84,14 @@ function CanvasView(): JSX.Element {
             }
 
             var data = JSON.stringify({
-                message: {
-                    action: "draw",
-                    canvasSize: { width: canvas.width, height: canvas.height },
-                    drawInstruction: drawInstruction
+                action: "sendmessage",
+                payload: {
+                    channel: artwork.id,
+                    message: {
+                        action: "draw",
+                        canvasSize: { width: canvas.width, height: canvas.height },
+                        drawInstruction: drawInstruction
+                    }
                 }
             })
 

@@ -18,7 +18,7 @@ function CellView(props: CellProps): JSX.Element {
     useEffect(() => {
         canvas = initCanvas()
         if (props.art.is_active) {
-            socket = initWebSocketClient(API_WS + props.art.id)
+            socket = initWebSocketClient(API_WS + "?channel=" + props.art.id)
         }
         return () => {
             if (socket && socket.OPEN) {
@@ -56,16 +56,15 @@ function CellView(props: CellProps): JSX.Element {
         }
 
         socket.onmessage = function (event) {
-            var data = JSON.parse(event.data)
-            console.log("socket recieving: ", data)
-
-            if (data.message.action == "clear") {
+            var message = JSON.parse(event.data).payload.message
+            // console.log("socket recieving: ", data.payload)
+            if (message.action == "clear") {
                 canvas.clear()
                 return
             }
 
-            var reductionFactor = data.message.canvasSize.width / canvas.getWidth()
-            var drawInstruction = data.message.drawInstruction
+            var reductionFactor = message.canvasSize.width / canvas.getWidth()
+            var drawInstruction = message.drawInstruction
 
             // Modify the coordinate path to fit the new canvas dimensions of a cell
             var pathCoordinates = drawInstruction.pathCoordinates
