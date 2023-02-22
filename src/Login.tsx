@@ -60,10 +60,20 @@ export default function Login(): JSX.Element {
     }
 
     async function signup(form: FormSignup) {
-        // alert('SUCCESS!! :-)\n\n' + JSON.stringify(form, null, 4));
-        setAuthMode("success")
-        // event.preventDefault()
-        // console.log(event)
+        var formData = {} as FormSignup
+        formData.username = form.username
+        formData.password = form.password
+        formData.confirmPassword = form.confirmPassword
+
+        try {
+            const response = await UsersService.usersSignup(formData)
+            console.log("Signup response: ", response)
+            setAuthMode("success")
+        } catch (error: any) {
+            console.dir(error)
+            loginErrors.username = error.body.detail
+            setErrorMessage(error.body.detail)
+        }
     }
 
     function selectHome() {
@@ -81,7 +91,7 @@ export default function Login(): JSX.Element {
                 <div className="Auth-form-content">
                     <h3 className="Auth-form-title">Succesfully Registered!</h3>
                     <div className="d-grid gap-2 mt-3">
-                        <button type="submit" className="btn btn-primary" onClick={() => window.location.reload()}>
+                        <button type="submit" className="btn btn-primary" onClick={() => setAuthMode("signin")}>
                             Login
                         </button>
                     </div>
