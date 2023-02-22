@@ -31,8 +31,8 @@ export default function GridView(): JSX.Element {
         }
 
         socket.onmessage = function (event) {
-            var data = JSON.parse(event.data)
-            console.log("socket recieving: ", data)
+            var message = JSON.parse(event.data).payload.message
+            console.log("socket recieving: ", message)
             fetchFeed()
         }
 
