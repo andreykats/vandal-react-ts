@@ -13,7 +13,7 @@ export default function Layout(): JSX.Element {
         }
     }, [])
 
-    function logout() {
+    const logout = () => {
         localStorage.removeItem('token')
         OpenAPI.TOKEN = ""
     }

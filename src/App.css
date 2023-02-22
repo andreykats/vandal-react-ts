@@ -51,7 +51,10 @@
   flex-direction: column;
   position: relative;
   margin: 10px;
-  border: 20px solid rgb(255, 0, 0);
+}
+
+.canvas-active {
+  border: 10px solid rgb(255, 0, 0);
 }
 
 .cell-image {

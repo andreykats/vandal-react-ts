@@ -99,11 +99,11 @@ function CellView(props: CellProps): JSX.Element {
     }
 
     return (
-        <div className={props.art.is_active ? "cell-container-active" : "cell-container"} style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height) }} onClick={() => props.didSelect(props.art)}>
+        <div className="cell-container" style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height) }} onClick={() => props.didSelect(props.art)}>
             {props.art.layers.reverse().map(layer => {
-                return <img style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height), zIndex: layer.id }} className="cell-image" key={layer.id} id={"layer-" + layer.id} src={imageSource(layer)} alt="" />
+                return <img className="cell-image" key={layer.id} id={"layer-" + layer.id} style={{ width: adjustSize(props.art.width), height: adjustSize(props.art.height), zIndex: layer.id }} src={imageSource(layer)} alt="" />
             })}
-            <canvas style={{ zIndex: props.art.id + 1 }} id={"canvas-" + props.art.id} />
+            <canvas className={props.art.is_active ? "canvas-active" : "canvas"} id={"canvas-" + props.art.id} style={{ zIndex: props.art.id + 1 }} />
         </div>
     )
 }
